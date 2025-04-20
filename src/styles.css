@@ -43,6 +43,7 @@ img {
   width: auto;
 }
 
+
 header {
   display: flex;
   justify-content: space-between;
@@ -50,4 +51,204 @@ header {
 
 .headline {
   font-size: 50pt;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.sidebar {
+  height: 100vh;
+  min-width: 320px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  color: #2A2B2A;
+  background-color: #90BEDE;
+  font-size: 1.4rem;
+  padding: 1rem;
+  border-right: solid 4px #2A2B2A;
+}
+
+nav {
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  height: 100px;
+  margin: 0px 0 45px 0;
+}
+
+.logo {
+  height: 100%;
+  width: auto;
+}
+
+.logo-wrapper::after {
+  content: "";
+  position: absolute;
+  bottom: -27px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 6px;
+  background-color: #2A2B2A;
+  border-radius: 20px;
+}
+
+.links {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0px;
+}
+
+.nav-home {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.home-button {
+  font-size: 1.6rem;
+}
+
+.nav-icon {
+  height: 1.8rem;
+  width: auto;
+  margin-right: 10px;
+  align-self: center;
+}
+
+.nav-new-project {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.project {
+  display: grid;
+  grid-template-columns: 1.8rem auto;
+  grid-template-rows: 1.8rem auto;
+  column-gap: 10px;
+  row-gap: 2px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.nav-project-icon {
+  height: 1.4rem;
+  margin-left: 3px;
+}
+
+.nav-project-desc {
+  grid-column-start: span 2;
+  font-size: 1.1rem;
+}
+
+.side-bar-icons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.icon {
+  width: 50px;
+  height: auto;
+}
+
+.main {
+  display: flex;
+  flex: 5;
+  font-size: 3.5rem;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 4;
+  min-width: 700px;
+}
+
+.header {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.page-title {
+  align-self: center;
+  color: #2A2B2A;
+}
+
+.header::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 6px;
+  background-color: #2A2B2A;
+  border-radius: 20px;
+}
+
+.content {
+  flex: 6;
+}
+
+.projects {
+  flex: 1;
+  height: 100vh;
+  min-width: 450px;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  color: #2A2B2A;
+  background-color: #F4BFDB;
+  padding: 1rem;
+  border-left: solid 4px #2A2B2A;
+  text-align: center;
+}
+
+.projects-title {
+  position: relative;
+  margin-top: 10px;
+}
+
+.projects-title::after {
+  content: "";
+  position: absolute;
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 6px;
+  background-color: #2A2B2A;
+  border-radius: 20px;
 }
