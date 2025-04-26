@@ -1,26 +1,16 @@
 import "./styles.css";
+import { appController } from "./app-controller.js";
+import { uiController } from "./ui-controller.js";
 import { loadHomePage } from "./home-page.js";
-import { Project } from "./project.js";
-// import { loadMenuPage } from "./menu-page.js";
-// import { loadAboutPage } from "./about-page.js";
 
 const content = document.querySelector(".content");
 
-/*document.querySelector(".home").addEventListener("click", () => {
-    clearContent();
-    loadHomePage(homeBackground);
-});
-
 function clearContent() {
-    while (homeBackground.hasChildNodes()) {
-        homeBackground.removeChild(homeBackground.firstChild);
+    while (content.hasChildNodes()) {
+        content.removeChild(content.firstChild);
     }
-}*/
+}
 
 loadHomePage(content);
 
-//remove later
-window.Project = Project;
-
-
-
+uiController.setUpEventListeners();

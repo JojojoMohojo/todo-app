@@ -184,7 +184,7 @@ nav {
   margin-bottom: 20px;
 }
 
-.project {
+.project-container {
   display: grid;
   grid-template-columns: 1.8rem auto;
   grid-template-rows: 1.8rem auto;
@@ -192,6 +192,12 @@ nav {
   row-gap: 2px;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.active-project {
+  outline: dotted 3px var(--white);
+  outline-offset: 5px;
+  border-radius: 0.5rem;
 }
 
 .nav-project-icon {
