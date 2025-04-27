@@ -28,7 +28,7 @@
                             <div class="nav-project-desc">Robin Sloan tablets Tumblrasd asd asd asd asd.</div>
                         </div>
                     </li>
-                    <li class="project pointer active-project">
+                    <li class="project pointer">
                         <div class="project-container">
                             <img class="nav-project-icon nav-icon pointer" src="icons/project.svg" alt="New project icon">
                             <div class="nav-project-name bold">The Odin Project</div>
@@ -57,8 +57,27 @@
             </div>
             <div class="content">
 
-            </div>
+            </div> 
         </div>
+        <dialog class="new-project-dialog">
+            <h1 class="new-project-form-heading bold">New Project</h1>
+            <form action="" method="get" id="new-project-form">
+                <fieldset class="remove-border-background">
+                    <div class="form-row">
+                        <label for="title">Title</label>
+                        <input id="new-project-title" type="text" name="title" placeholder="Cutting starts now!">
+                    </div>
+                    <div class="form-row">
+                        <label for="description">Description</label>
+                        <textarea id="new-project-desc" name="description" rows="3" autocorrect="on" placeholder="I want to reach a body fat percentage of 15% by August 1st"></textarea>
+                    </div>
+                </fieldset>
+                <div class="new-project-form-buttons bold">
+                    <button type="create" id="create-project-button">Create</button>
+                    <button id="close-project-button">Cancel</button>
+                </div>
+            </form>
+        </dialog>
     </div>
 </body>
 </html>

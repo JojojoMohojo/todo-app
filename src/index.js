@@ -14,3 +14,5 @@ function clearContent() {
 loadHomePage(content);
 
 uiController.setUpEventListeners();
+appController.createDummyProjects();
+uiController.renderProjectsList();

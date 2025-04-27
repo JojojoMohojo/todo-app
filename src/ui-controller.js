@@ -1,22 +1,26 @@
 import { appController } from "./app-controller";
+import { svg } from "./svg";
 
 class UIController {
     constructor() {
-        //this.links = document.querySelector(".links");
+        //Side bar
         this.newProject = document.querySelector(".nav-new-project");
         this.projectList = document.querySelector(".project-list");
 
-        //SVG
-        this.projectIcon = `
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm200-190q13 0 21.5-8.5T510-820q0-13-8.5-21.5T480-850q-13 0-21.5 8.5T450-820q0 13 8.5 21.5T480-790ZM200-200v-560 560Z"/></svg>
-        `;
+        //New project form
+        this.newProjectDialog = document.querySelector(".new-project-dialog");
+        this.newProjectForm = document.querySelector("#new-project-form");
+        this.createProjectButton = document.querySelector("#create-project-button");
+        this.closeProjectButton = document.querySelector("#close-project-button");
+        this.newProjectTitle = document.querySelector("#new-project-title");
+        this.newProjectDesc = document.querySelector("#new-project-desc");
     }
 
-    renderProjectsList(projects) { 
+    renderProjectsList() { 
         while (this.projectList.querySelector(".project")) {
             this.projectList.querySelector(".project").remove();
         };
-        projects.forEach(project => this.createProjectElement(project));
+        appController.getProjects().forEach(project => this.createProjectElement(project));
     }
 
     createProjectElement(project) {
@@ -31,7 +35,7 @@ class UIController {
         const icon = document.createElement("div");
         icon.classList.add("nav-project-icon");
         icon.classList.add("nav-icon");
-        icon.innerHTML = this.projectIcon;
+        icon.innerHTML = svg.getSvgIcons().projectIcon;
 
         const name = document.createElement("div");
         name.classList.add("nav-project-name");
@@ -64,13 +68,44 @@ class UIController {
         if (newProjectId) {
             document.querySelector(`#${CSS.escape(newProjectId)}`)?.classList.add("active-project");
         }
-    } 
+    }
+
+    openDialog(type) {
+        switch (type) {
+            case "project":
+                this.newProjectDialog.showModal();
+        }    
+    }
+
+    closeDialog(type) {
+        switch (type) {
+            case "project":
+                this.newProjectDialog.close();
+        }    
+    }
+
+    clearForm(type) {
+        switch (type) {
+            case "project":
+                this.newProjectForm.reset();
+        } 
+    }
 
     setUpEventListeners() { 
-        this.newProject.addEventListener("click", () => {
-            const title = prompt("Enter project title");
-            const description = prompt("Enter project description");
-            appController.createProject(title, description);
+        this.newProject.addEventListener("click", (e) => {
+            this.openDialog("project");
+        })
+
+        this.closeProjectButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            this.closeDialog("project");
+            this.clearForm("project");
+        })
+
+        this.createProjectButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            appController.createProject(this.newProjectTitle.value, this.newProjectDesc.value);
+            this.clearForm("project");
         })
     }
 }

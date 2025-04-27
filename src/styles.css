@@ -6,8 +6,9 @@
   -webkit-font-smoothing: antialiased;
   --jet-black: #2A2B2A;
   --white: #ffffff;
-  --baby-blue: #90BEDE;
+  --uranian-blue: #BDE0FE;
   --grey: #b9b9b9;
+  --thistle: #CDB4DB;
 }
 
 h1, h2, h3, h4, h5, figure, p, ol, ul {
@@ -92,8 +93,10 @@ input[type='checkbox']:checked::after {
   transform: rotate(45deg);
 }
 
-body {
-  display: flex;
+textarea {
+  resize: none;
+  width: 100%;
+  padding: 0px 5px 0px 5px;
 }
 
 * {
@@ -104,8 +107,17 @@ body {
   font-weight: 600;
 }
 
+.remove-border-background {
+  background: none;
+  border: none;
+}
+
 .pointer {
   cursor: pointer;
+}
+
+.layout {
+  display: flex;
 }
 
 .sidebar {
@@ -116,7 +128,7 @@ body {
   flex-direction: column;
   flex: 1;
   color: var(--jet-black);
-  background-color: var(--baby-blue);
+  background-color: var(--uranian-blue);
   font-size: 1.4rem;
   padding: 1rem;
   border-right: solid 4px var(--jet-black);
@@ -233,7 +245,6 @@ nav {
 .page {
   display: flex;
   flex-direction: column;
-  flex: 4;
   min-width: 700px;
 }
 
@@ -306,15 +317,90 @@ nav {
   margin-bottom: 10px;
 }
 
+.new-project-dialog {
+  position: fixed;
+  top: 25%;
+  left: calc(320px + (((100vw / 6) * 5) / 2));
+  transform: translate(-50%);
+  width: 500px;
+  padding: 10px 20px 25px 20px;
+  margin: 0;
+  font-size: 1.2rem;
+  background-color: var(--thistle);
+  color: var(--jet-black);
+  border: solid 4px var(--jet-black);
+  border-radius: 20px;
+  z-index: 2000;
+  .new-project-dialog {
+    animation: slideDown 0.3s ease-out;
+  }
 
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -20%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+}
 
+.new-project-form-heading {
+ font-size: 2rem;
+ text-align: center;
+}
 
+fieldset {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+}
 
+.form-row {
+  width: 100%;
+  padding: 0;
+  margin-bottom: 15px;
+}
 
+label {
+  font-size: 1.4rem;
+  display: block;
+}
 
+input {
+  width: 100%;
+  padding: 0 5px 0 5px;
+  font-size: 1.4rem;
+}
 
+.new-project-form-buttons {
+  display: flex;
+  justify-content: space-around;
+}
 
+.new-project-form-buttons > button {
+  height: 35px;
+  width: 110px;
+}
 
+button {
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: var(--white);
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--grey);
+}
+
+::backdrop {
+  background: rgba(0, 0, 0, 0.3);
+}
 
 
 /*.projects {
