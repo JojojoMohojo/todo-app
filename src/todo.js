@@ -2,7 +2,7 @@ export class Todo {
     constructor(description, dueDate, priority, list) {
         this.id = crypto.randomUUID();
         this.description = description;
-        this.dueDate = dueDate;
+        this.dueDate = dueDate ? new Date(dueDate.setHours(0, 0, 0, 0)) : null;
         this.priority = priority;
         this.completed = false;
         this.listName = list.title;

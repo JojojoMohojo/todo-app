@@ -11,8 +11,12 @@ function clearContent() {
     }
 }
 
-loadHomePage(content);
+
 
 uiController.setUpEventListeners();
+if (appController.getProjects() === null) {
+    appController.createProject("Default", "Default");
+}
 appController.createDummyProjects();
 uiController.renderProjectsList();
+loadHomePage(content);

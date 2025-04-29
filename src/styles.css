@@ -48,14 +48,9 @@ img {
   width: auto;
 }
 
-
 header {
   display: flex;
   justify-content: space-between;
-}
-
-.headline {
-  font-size: 50pt;
 }
 
 ul {
@@ -279,12 +274,17 @@ nav {
 .content {
   overflow-y: auto;
   flex-grow: 1;
-  padding: 0px 50px 50px 50px;
+  padding: 0px 50px 50px 30px;
 }
 
 .section {
   margin-bottom: 70px;
   position: relative;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
 }
 
 .section::after {
@@ -297,9 +297,24 @@ nav {
   border-radius: 20px;
 }
 
+.heading-container {
+  display: flex;
+  align-items: center;
+  padding-bottom: 8px;
+  gap: 10px;
+}
+
+.new-todo-button {
+  height: 2rem;
+  width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3px;
+}
+
 .heading {
   font-size: 2rem;
-  padding-bottom: 8px;
 }
 
 .list-item-container {
@@ -314,6 +329,7 @@ nav {
 }
 
 .section ul li {
+  margin-left: 45px;
   margin-bottom: 10px;
 }
 
