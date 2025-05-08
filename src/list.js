@@ -5,7 +5,7 @@ export class List {
         this.id = crypto.randomUUID();
         this.title = title;
         this.todos = [];
-        this.projectName = project.title;
+        this.project = project;
         this.projectId = project.id;
     }
 

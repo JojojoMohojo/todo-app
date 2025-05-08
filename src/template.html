@@ -78,6 +78,29 @@
                 </div>
             </form>
         </dialog>
+        <dialog class="new-todo-dialog">
+            <h1 class="new-todo-form-heading bold">New Todo</h1>
+            <form action="" method="get" id="new-todo-form">
+                <fieldset class="remove-border-background">
+                    <div class="form-row">
+                        <label for="description">Title</label>
+                        <input id="new-todo-desc" type="text" name="description" placeholder="Cutting starts now!">
+                    </div>
+                    <div class="form-row">
+                        <label for="date">Due date</label>
+                        <input id="new-todo-date" type="date" name="date">
+                    </div>
+                    <div class="form-row">
+                        <label for="priority">Priority</label>
+                        <input id="new-todo-priority" type="number" name="priority">
+                    </div>
+                </fieldset>
+                <div class="new-todo-form-buttons bold">
+                    <button type="create" id="create-todo-button">Create</button>
+                    <button id="close-todo-button">Cancel</button>
+                </div>
+            </form>
+        </dialog>
     </div>
 </body>
 </html>

@@ -5,7 +5,7 @@ export class Todo {
         this.dueDate = dueDate ? new Date(dueDate.setHours(0, 0, 0, 0)) : null;
         this.priority = priority;
         this.completed = false;
-        this.listName = list.title;
+        this.list = list;
         this.listId = list.id;
     }
 

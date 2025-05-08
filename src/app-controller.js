@@ -65,16 +65,14 @@ class AppController {
     }
 
     switchPage(projectId) {
-        this.setActiveProject(projectId);
-        uiController.highlightActiveProject(projectId);
-        /*if (projectId) {
-            loadProjectPage(projectId);
+        if (projectId) {
             this.setActiveProject(projectId);
+            uiController.renderProjectPage(projectId);
         } else {
-            loadHomePage();
             this.setActiveProject();
-        }*/
-    }
+            uiController.renderHomePage();
+        }
+    }    
     
     saveToStorage() { 
         // TBC

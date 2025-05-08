@@ -2,21 +2,17 @@ import "./styles.css";
 import { appController } from "./app-controller.js";
 import { uiController } from "./ui-controller.js";
 import { loadHomePage } from "./home-page.js";
+import { Project } from "./project.js";
 
 const content = document.querySelector(".content");
 
-function clearContent() {
-    while (content.hasChildNodes()) {
-        content.removeChild(content.firstChild);
-    }
-}
-
-
-
 uiController.setUpEventListeners();
-if (appController.getProjects() === null) {
+if (appController.getProjects().length === 0) {
     appController.createProject("Default", "Default");
+    const project = appController.getProjects()[0];
+    project.createList("Default");
+    console.log(appController.getProjects()[0].lists[0]);
 }
 appController.createDummyProjects();
 uiController.renderProjectsList();
-loadHomePage(content);
+appController.switchPage();

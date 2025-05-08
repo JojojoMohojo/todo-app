@@ -1,9 +1,13 @@
 import { appController } from "./app-controller";
 import { svg } from "./svg";
+import { loadHomePage } from "./home-page";
+import { format } from "date-fns";
 
 class UIController {
     constructor() {
+        this.content = document.querySelector(".content");
         //Side bar
+        this.homeButton = document.querySelector(".nav-home");
         this.newProject = document.querySelector(".nav-new-project");
         this.projectList = document.querySelector(".project-list");
 
@@ -14,13 +18,38 @@ class UIController {
         this.closeProjectButton = document.querySelector("#close-project-button");
         this.newProjectTitle = document.querySelector("#new-project-title");
         this.newProjectDesc = document.querySelector("#new-project-desc");
+
+        //New todo form
+        this.newTodoDialog = document.querySelector(".new-todo-dialog");
+        this.newTodoForm = document.querySelector("#new-todo-form");
+        this.createTodoButton = document.querySelector("#create-todo-button");
+        this.closeTodoButton = document.querySelector("#close-todo-button");
+        this.newTodoDesc = document.querySelector("#new-todo-desc");
+        this.newTodoDate = document.querySelector("#new-todo-date");
+        this.newTodoPriority = document.querySelector("#new-todo-priority");
+    }
+
+    renderHomePage() {
+        this.clearContent();
+        loadHomePage(this.content);
+    }
+    
+
+    clearContent() {
+        while (this.content.hasChildNodes()) {
+            this.content.removeChild(this.content.firstChild);
+        }
     }
 
     renderProjectsList() { 
         while (this.projectList.querySelector(".project")) {
             this.projectList.querySelector(".project").remove();
         };
-        appController.getProjects().forEach(project => this.createProjectElement(project));
+        appController.getProjects().forEach(project =>  {
+            if (project.title !== "Default") {
+                this.createProjectElement(project)
+            }
+        });
     }
 
     createProjectElement(project) {
@@ -57,9 +86,114 @@ class UIController {
         this.projectList.appendChild(newProject);
     }
 
-    renderTodosForProject(projectId) { 
-        
-    }
+    renderHomeSections(content) {
+        // Clear existing sections
+        while (content.firstChild) {
+            content.removeChild(content.firstChild);
+        }
+
+        const projects = appController.getProjects();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const dueTodos = [];
+        const tomorrowTodos = [];
+        const upcomingTodos = [];
+
+        projects.forEach(project =>
+            project.lists.forEach(list =>
+                list.todos.forEach(todo => {
+                    if (!(todo.dueDate instanceof Date)) return;
+                    const time = todo.dueDate.getTime();
+                    if (time <= today.getTime()) dueTodos.push(todo);
+                    else if (time === tomorrow.getTime()) tomorrowTodos.push(todo);
+                    else upcomingTodos.push(todo);
+                })
+            )
+        );
+
+        if (dueTodos.length) content.appendChild(this.createSection("Due", dueTodos, () => this.renderHomeSections(content)));
+        if (tomorrowTodos.length) content.appendChild(this.createSection("Tomorrow", tomorrowTodos, () => this.renderHomeSections(content)));
+        if (upcomingTodos.length) content.appendChild(this.createSection("Upcoming", upcomingTodos, () => this.renderHomeSections(content)));
+    }    
+
+    // Section builder helper
+    createSection(title, todos, rerenderFn) {
+        const section = document.createElement("div");
+        section.classList.add("section");
+
+        const headingContainer = document.createElement("div");
+        headingContainer.classList.add("heading-container");
+        section.appendChild(headingContainer);
+
+        // const newButton = document.createElement("div");
+        // newButton.classList.add("new-todo-button");
+        // newButton.classList.add("pointer");
+        // newButton.innerHTML = svg.getSvgIcons().addBoxIcon;
+        // headingContainer.appendChild(newButton);
+        // newButton.addEventListener("click", (e) => {
+        //     uiController.openDialog("todo");
+        // })
+
+        const heading = document.createElement("div");
+        heading.classList.add("heading");
+        heading.textContent = title;
+        headingContainer.appendChild(heading);        
+
+        const ul = document.createElement("ul");
+
+        todos.forEach((todo, index) => {
+            const todoItem = document.createElement("li");
+            todoItem.id = `${todo.id}`
+
+            const container = document.createElement("div");
+            container.classList.add("list-item-container");
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.id = `${title.toLowerCase()}-item-${index}`;
+            checkbox.name = checkbox.id;
+            checkbox.checked = todo.completed;
+            checkbox.addEventListener("click", () => {
+                todo.changeCompletedStatus();
+            })
+
+            const label = document.createElement("label");
+            label.setAttribute("for", checkbox.id);
+            label.textContent = todo.description;
+
+            const date = document.createElement("div");
+            date.classList.add("todo-date");
+            const formattedDate = format(todo.dueDate, "dd MMM yyyy");
+            date.textContent = formattedDate;
+
+            const priority = document.createElement("div");
+            priority.classList.add("todo-priority");
+            priority.textContent = todo.priority;
+
+            const deleteButton = document.createElement("div");
+            deleteButton.classList.add("delete-todo-button");
+            deleteButton.classList.add("pointer");
+            deleteButton.innerHTML = svg.getSvgIcons().trashIcon;
+            deleteButton.addEventListener("click", () => {
+                todo.list.deleteTodo(todo.id);
+                rerenderFn();
+            })
+
+            container.appendChild(checkbox);
+            container.appendChild(label);
+            container.appendChild(date);
+            container.appendChild(priority);
+            container.appendChild(deleteButton);
+            todoItem.appendChild(container);
+            ul.appendChild(todoItem);
+        });
+
+        section.appendChild(ul);
+        return section;
+    };
 
     highlightActiveProject(newProjectId, oldProjectId) {
         if (oldProjectId) {
@@ -74,6 +208,13 @@ class UIController {
         switch (type) {
             case "project":
                 this.newProjectDialog.showModal();
+                break;
+            /*case "list":
+                this.newListForm.showModal();
+                break;*/
+            case "todo":
+                this.newTodoDialog.showModal();
+                break;
         }    
     }
 
@@ -81,6 +222,13 @@ class UIController {
         switch (type) {
             case "project":
                 this.newProjectDialog.close();
+                break;
+            /*case "list":
+                this.newListForm.close();
+                break;*/
+            case "todo":
+                this.newTodoDialog.close();
+                break;
         }    
     }
 
@@ -88,6 +236,13 @@ class UIController {
         switch (type) {
             case "project":
                 this.newProjectForm.reset();
+                break;
+            /*case "list":
+                this.newListForm.reset();
+                break;*/
+            case "todo":
+                this.newTodoDialog.reset();
+                break;
         } 
     }
 
@@ -106,6 +261,16 @@ class UIController {
             e.preventDefault();
             appController.createProject(this.newProjectTitle.value, this.newProjectDesc.value);
             this.clearForm("project");
+        })
+
+        this.createTodoButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            appController.createTodo(this.newTodoDesc.value, this.newTodoDate.value, this.newTodoPriority.value)
+            this.clearForm("todo");
+        })
+
+        this.homeButton.addEventListener("click", (e) => {
+            appController.switchPage();
         })
     }
 }

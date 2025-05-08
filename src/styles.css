@@ -9,6 +9,7 @@
   --uranian-blue: #BDE0FE;
   --grey: #b9b9b9;
   --thistle: #CDB4DB;
+  --fairy-tale: #FFC8DD;
 }
 
 h1, h2, h3, h4, h5, figure, p, ol, ul {
@@ -274,7 +275,7 @@ nav {
 .content {
   overflow-y: auto;
   flex-grow: 1;
-  padding: 0px 50px 50px 30px;
+  padding: 15px 0px 50px 50px;
 }
 
 .section {
@@ -318,22 +319,52 @@ svg {
 }
 
 .list-item-container {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
-.list-item-container > input {
-  margin-top: 2px;
+.todo-date,
+.todo-priority
+ {
+  font-size: 1rem;
+  margin-top: 4px;
+
+  padding: 0px 5px;
+  border-radius: 5px;
+}
+
+.todo-date {
+  background-color: var(--thistle);
+}
+
+.todo-priority {
+  background-color: var(--fairy-tale);
+  padding: 0px 8px;
+}
+
+.delete-todo-button {
+  margin-top: 7px;
+}
+
+.delete-todo-button svg {
+  fill: #ffffff;
+  transition: fill 0.5s ease;
+  cursor: pointer;
+}
+
+.list-item-container:hover .delete-todo-button svg {
+  fill: #000000;
 }
 
 .section ul li {
-  margin-left: 45px;
+  /* margin-left: 45px; */
   margin-bottom: 10px;
 }
 
-.new-project-dialog {
+.new-project-dialog,
+.new-todo-dialog {
   position: fixed;
   top: 25%;
   left: calc(320px + (((100vw / 6) * 5) / 2));
@@ -363,7 +394,8 @@ svg {
   }
 }
 
-.new-project-form-heading {
+.new-project-form-heading,
+.new-todo-form-heading {
  font-size: 2rem;
  text-align: center;
 }
@@ -393,12 +425,14 @@ input {
   font-size: 1.4rem;
 }
 
-.new-project-form-buttons {
+.new-project-form-buttons,
+.new-todo-form-buttons {
   display: flex;
   justify-content: space-around;
 }
 
-.new-project-form-buttons > button {
+.new-project-form-buttons > button,
+.new-todo-form-buttons > button {
   height: 35px;
   width: 110px;
 }
