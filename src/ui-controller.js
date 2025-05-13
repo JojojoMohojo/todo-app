@@ -1,11 +1,11 @@
 import { appController } from "./app-controller";
 import { svg } from "./svg";
-import { loadHomePage } from "./home-page";
 import { format } from "date-fns";
 
 class UIController {
     constructor() {
         this.content = document.querySelector(".content");
+        this.pageTitle = document.querySelector(".page-title")
         //Side bar
         this.homeButton = document.querySelector(".nav-home");
         this.newProject = document.querySelector(".nav-new-project");
@@ -27,13 +27,7 @@ class UIController {
         this.newTodoDesc = document.querySelector("#new-todo-desc");
         this.newTodoDate = document.querySelector("#new-todo-date");
         this.newTodoPriority = document.querySelector("#new-todo-priority");
-    }
-
-    renderHomePage() {
-        this.clearContent();
-        loadHomePage(this.content);
-    }
-    
+    }   
 
     clearContent() {
         while (this.content.hasChildNodes()) {
@@ -76,7 +70,7 @@ class UIController {
         description.innerHTML = project.description;
 
         projectContainer.addEventListener("click", () => {
-            appController.switchPage(project.id);
+            appController.switchPage(project);
         });
 
         projectContainer.appendChild(icon);
@@ -86,11 +80,9 @@ class UIController {
         this.projectList.appendChild(newProject);
     }
 
-    renderHomeSections(content) {
-        // Clear existing sections
-        while (content.firstChild) {
-            content.removeChild(content.firstChild);
-        }
+    renderHomePage() {
+        this.pageTitle.textContent= "Home";
+        this.clearContent();
 
         const projects = appController.getProjects();
         const today = new Date();
@@ -112,12 +104,32 @@ class UIController {
                     else upcomingTodos.push(todo);
                 })
             )
-        );
+        ); 
 
-        if (dueTodos.length) content.appendChild(this.createSection("Due", dueTodos, () => this.renderHomeSections(content)));
-        if (tomorrowTodos.length) content.appendChild(this.createSection("Tomorrow", tomorrowTodos, () => this.renderHomeSections(content)));
-        if (upcomingTodos.length) content.appendChild(this.createSection("Upcoming", upcomingTodos, () => this.renderHomeSections(content)));
-    }    
+        dueTodos.sort((a, b) => a.priority - b.priority);
+        tomorrowTodos.sort((a, b) => a.priority - b.priority);
+        upcomingTodos.sort((a, b) => a.priority - b.priority);
+
+        if (dueTodos.length) this.content.appendChild(this.createSection("Due", dueTodos, () => this.renderHomePage(this.content)));
+        if (tomorrowTodos.length) this.content.appendChild(this.createSection("Tomorrow", tomorrowTodos, () => this.renderHomePage(this.content)));
+        if (upcomingTodos.length) this.content.appendChild(this.createSection("Upcoming", upcomingTodos, () => this.renderHomePage(this.content)));
+    }
+    
+    renderProjectPage() {
+        const project = appController.getActiveProject();
+        this.pageTitle.textContent = project.title;
+        this.clearContent();
+
+        const description = document.createElement("div");
+        description.classList.add("project-description");
+        description.textContent = project.description;
+        this.content.appendChild(description);
+
+        project.lists.forEach(list => {
+            list.todos.sort((a, b) => a.priority - b.priority);
+            this.content.appendChild(this.createSection(list.title, list.todos, () => this.renderProjectPage(this.content)));
+        })
+    }
 
     // Section builder helper
     createSection(title, todos, rerenderFn) {
@@ -195,12 +207,12 @@ class UIController {
         return section;
     };
 
-    highlightActiveProject(newProjectId, oldProjectId) {
-        if (oldProjectId) {
-            document.querySelector(`#${CSS.escape(oldProjectId)}`)?.classList.remove("active-project");
+    highlightActiveProject(newProject, oldProject) {
+        if (oldProject) {
+            document.querySelector(`#${CSS.escape(oldProject.id)}`)?.classList.remove("active-project");
         }
-        if (newProjectId) {
-            document.querySelector(`#${CSS.escape(newProjectId)}`)?.classList.add("active-project");
+        if (newProject) {
+            document.querySelector(`#${CSS.escape(newProject.id)}`)?.classList.add("active-project");
         }
     }
 
@@ -269,7 +281,7 @@ class UIController {
             this.clearForm("todo");
         })
 
-        this.homeButton.addEventListener("click", (e) => {
+        this.homeButton.addEventListener("click", () => {
             appController.switchPage();
         })
     }

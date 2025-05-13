@@ -1,7 +1,6 @@
 import "./styles.css";
 import { appController } from "./app-controller.js";
 import { uiController } from "./ui-controller.js";
-import { loadHomePage } from "./home-page.js";
 import { Project } from "./project.js";
 
 const content = document.querySelector(".content");

@@ -99,6 +99,7 @@ textarea {
   box-sizing: border-box;
 }
 
+
 .bold {
   font-weight: 600;
 }
@@ -170,21 +171,25 @@ nav {
   margin-bottom: 0px;
 }
 
+.nav-icon {
+  height: 1.6rem;
+  align-self: center;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-home > .nav-home-icon,
+.nav-new-project > .new-project-icon {
+  margin-right: 12px;
+}
+
 .nav-home {
   display: flex;
-  align-items: center;
   margin-bottom: 20px;
 }
 
 .home-button {
   font-size: 1.6rem;
-}
-
-.nav-icon {
-  height: 1.8rem;
-  width: auto;
-  margin-right: 10px;
-  align-self: center;
 }
 
 .nav-new-project {
@@ -209,8 +214,8 @@ nav {
 }
 
 .nav-project-icon {
+  display: flex;
   height: 1.4rem;
-  margin-left: 3px;
 }
 
 .nav-project-desc {
@@ -246,17 +251,15 @@ nav {
 
 .header {
   display: flex;
-  justify-content: center;
   position: sticky;
   top: 0;
   background-color: var(--white);
   z-index: 999;
-  padding: 20px;
+  padding: 20px 0px 20px 50px;
   margin-bottom: 20px;
 }
 
 .page-title {
-  align-self: center;
   color: var(--jet-black);
 }
 
@@ -266,7 +269,7 @@ nav {
   bottom: -1px;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
+  width: 95%;
   height: 4px;
   background-color: var(--jet-black);
   border-radius: 20px;
@@ -275,7 +278,14 @@ nav {
 .content {
   overflow-y: auto;
   flex-grow: 1;
-  padding: 15px 0px 50px 50px;
+  padding: 0px 0px 50px 50px;
+}
+
+.project-description {
+  font-size: 1.4rem;
+  width: 50%;
+  color: var(--grey);
+  margin-bottom: 20px;
 }
 
 .section {
@@ -292,7 +302,7 @@ svg {
   content: "";
   position: absolute;
   bottom: -40px;
-  width: 25%;
+  width: 30%;
   height: 4px;
   background-color: var(--grey);
   border-radius: 20px;
@@ -326,11 +336,8 @@ svg {
 }
 
 .todo-date,
-.todo-priority
- {
+.todo-priority {
   font-size: 1rem;
-  margin-top: 4px;
-
   padding: 0px 5px;
   border-radius: 5px;
 }
@@ -345,7 +352,10 @@ svg {
 }
 
 .delete-todo-button {
-  margin-top: 7px;
+  display: flex;
+  align-self: center;
+  padding: 0;
+  margin: 0;
 }
 
 .delete-todo-button svg {
@@ -359,7 +369,6 @@ svg {
 }
 
 .section ul li {
-  /* margin-left: 45px; */
   margin-bottom: 10px;
 }
 
@@ -378,20 +387,7 @@ svg {
   border: solid 4px var(--jet-black);
   border-radius: 20px;
   z-index: 2000;
-  .new-project-dialog {
-    animation: slideDown 0.3s ease-out;
-  }
 
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translate(-50%, -20%);
-    }
-    to {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-  }
 }
 
 .new-project-form-heading,
