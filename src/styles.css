@@ -10,6 +10,7 @@
   --grey: #b9b9b9;
   --thistle: #CDB4DB;
   --fairy-tale: #FFC8DD;
+  --mint-green: #5DFFD9;
 }
 
 h1, h2, h3, h4, h5, figure, p, ol, ul {
@@ -288,6 +289,29 @@ nav {
   margin-bottom: 20px;
 }
 
+.new-list-container {
+  display: flex;
+  gap: 20px;
+  width: 200px;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.6rem;
+  background-color: var(--mint-green);
+  border-radius: 25px;
+  margin-bottom: 20px;
+}
+
+.new-list-button {
+  display: flex;
+  height: 1.8rem;
+  width: 1.8rem;
+  align-self: center;
+}
+
+.empty {
+  font-size: 1.6rem;
+}
+
 .section {
   margin-bottom: 70px;
   position: relative;
@@ -316,12 +340,11 @@ svg {
 }
 
 .new-todo-button {
-  height: 2rem;
-  width: 2rem;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 3px;
+  height: 1.6rem;
+  width: 1.6rem;
+  align-self: center;
+  margin-top: 7px;
 }
 
 .heading {
@@ -351,6 +374,17 @@ svg {
   padding: 0px 8px;
 }
 
+.completed-todo-text {
+  text-decoration: line-through;
+  color: var(--grey)
+}
+
+.completed-todo-details {
+  text-decoration: line-through;
+  color: var(--grey);
+  background-color: var(--mint-green);
+}
+
 .delete-todo-button {
   display: flex;
   align-self: center;
@@ -358,14 +392,16 @@ svg {
   margin: 0;
 }
 
+.new-todo-button svg,
 .delete-todo-button svg {
-  fill: #ffffff;
+  fill: var(--white);
   transition: fill 0.5s ease;
   cursor: pointer;
 }
 
+.heading-container:hover .new-todo-button svg,
 .list-item-container:hover .delete-todo-button svg {
-  fill: #000000;
+  fill: var(--jet-black);
 }
 
 .section ul li {
@@ -373,6 +409,7 @@ svg {
 }
 
 .new-project-dialog,
+.new-list-dialog,
 .new-todo-dialog {
   position: fixed;
   top: 25%;
@@ -391,6 +428,7 @@ svg {
 }
 
 .new-project-form-heading,
+.new-list-form-heading,
 .new-todo-form-heading {
  font-size: 2rem;
  text-align: center;
@@ -422,12 +460,14 @@ input {
 }
 
 .new-project-form-buttons,
+.new-list-form-buttons,
 .new-todo-form-buttons {
   display: flex;
   justify-content: space-around;
 }
 
 .new-project-form-buttons > button,
+.new-list-form-buttons > button,
 .new-todo-form-buttons > button {
   height: 35px;
   width: 110px;

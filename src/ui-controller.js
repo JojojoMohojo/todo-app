@@ -1,11 +1,13 @@
 import { appController } from "./app-controller";
 import { svg } from "./svg";
 import { format } from "date-fns";
+import { VirtualList } from "./virtual-list";
 
 class UIController {
     constructor() {
         this.content = document.querySelector(".content");
         this.pageTitle = document.querySelector(".page-title")
+
         //Side bar
         this.homeButton = document.querySelector(".nav-home");
         this.newProject = document.querySelector(".nav-new-project");
@@ -19,7 +21,8 @@ class UIController {
         this.newProjectTitle = document.querySelector("#new-project-title");
         this.newProjectDesc = document.querySelector("#new-project-desc");
 
-        //New todo form
+        //New list form
+        this.activeList = null;
         this.newTodoDialog = document.querySelector(".new-todo-dialog");
         this.newTodoForm = document.querySelector("#new-todo-form");
         this.createTodoButton = document.querySelector("#create-todo-button");
@@ -27,6 +30,13 @@ class UIController {
         this.newTodoDesc = document.querySelector("#new-todo-desc");
         this.newTodoDate = document.querySelector("#new-todo-date");
         this.newTodoPriority = document.querySelector("#new-todo-priority");
+
+        //New todo form
+        this.newListDialog = document.querySelector(".new-list-dialog");
+        this.newListForm = document.querySelector("#new-list-form");
+        this.createListButton = document.querySelector("#create-list-button");
+        this.closeListButton = document.querySelector("#close-list-button");
+        this.newListTitle = document.querySelector("#new-list-title");
     }   
 
     clearContent() {
@@ -85,22 +95,25 @@ class UIController {
         this.clearContent();
 
         const projects = appController.getProjects();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0);
 
-        const dueTodos = [];
-        const tomorrowTodos = [];
-        const upcomingTodos = [];
+        const tomorrowDate = new Date(todayDate);
+        tomorrowDate.setDate(todayDate.getDate() + 1);
+        console.log(todayDate);
+        console.log(tomorrowDate);
+
+        let dueTodos = [];
+        let tomorrowTodos = [];
+        let upcomingTodos = [];
 
         projects.forEach(project =>
             project.lists.forEach(list =>
                 list.todos.forEach(todo => {
                     if (!(todo.dueDate instanceof Date)) return;
                     const time = todo.dueDate.getTime();
-                    if (time <= today.getTime()) dueTodos.push(todo);
-                    else if (time === tomorrow.getTime()) tomorrowTodos.push(todo);
+                    if (time <= todayDate.getTime()) dueTodos.push(todo);
+                    else if (time === tomorrowDate.getTime()) tomorrowTodos.push(todo);
                     else upcomingTodos.push(todo);
                 })
             )
@@ -110,9 +123,13 @@ class UIController {
         tomorrowTodos.sort((a, b) => a.priority - b.priority);
         upcomingTodos.sort((a, b) => a.priority - b.priority);
 
-        if (dueTodos.length) this.content.appendChild(this.createSection("Due", dueTodos, () => this.renderHomePage(this.content)));
-        if (tomorrowTodos.length) this.content.appendChild(this.createSection("Tomorrow", tomorrowTodos, () => this.renderHomePage(this.content)));
-        if (upcomingTodos.length) this.content.appendChild(this.createSection("Upcoming", upcomingTodos, () => this.renderHomePage(this.content)));
+        const dueList = new VirtualList("Due", dueTodos, todayDate);
+        const tomorrowList = new VirtualList("Tomorrow", tomorrowTodos, tomorrowDate);
+        const upcomingList = new VirtualList("Upcoming", upcomingTodos);     
+
+        if (dueTodos.length) this.content.appendChild(this.createSection(dueList, () => this.renderHomePage(this.content)));
+        if (tomorrowTodos.length) this.content.appendChild(this.createSection(tomorrowList, () => this.renderHomePage(this.content)));
+        if (upcomingTodos.length) this.content.appendChild(this.createSection(upcomingList, () => this.renderHomePage(this.content)));
     }
     
     renderProjectPage() {
@@ -125,14 +142,46 @@ class UIController {
         description.textContent = project.description;
         this.content.appendChild(description);
 
+        const newListContainer = document.createElement("div");
+        newListContainer.classList.add("new-list-container");
+        newListContainer.classList.add("pointer");
+        newListContainer.classList.add("bold");
+        newListContainer.textContent = "New list";
+
+        const newList = document.createElement("div");
+        newList.classList.add("new-list-button");
+        newList.innerHTML = svg.getSvgIcons().addListIcon;
+
+        newListContainer.appendChild(newList);
+        this.content.appendChild(newListContainer);
+
+        newListContainer.addEventListener("click", () => {
+            this.openDialog("list");
+        });
+
         project.lists.forEach(list => {
             list.todos.sort((a, b) => a.priority - b.priority);
-            this.content.appendChild(this.createSection(list.title, list.todos, () => this.renderProjectPage(this.content)));
-        })
+            this.content.appendChild(this.createSection(list, () => this.renderProjectPage(this.content)));
+        });        
+
+        if (this.content.children.length === 2) {
+            const message = document.createElement("div");
+            message.classList.add("empty");
+            message.textContent = "No lists found. Start by creating a list and adding some todos";
+            this.content.appendChild(message);
+        }
+    }
+
+    rerenderPage() {
+        if (appController.getActiveProject()) {
+            this.renderProjectPage();
+        } else {
+            this.renderHomePage();
+        }
     }
 
     // Section builder helper
-    createSection(title, todos, rerenderFn) {
+    createSection(list, rerenderFn) {
         const section = document.createElement("div");
         section.classList.add("section");
 
@@ -140,23 +189,30 @@ class UIController {
         headingContainer.classList.add("heading-container");
         section.appendChild(headingContainer);
 
-        // const newButton = document.createElement("div");
-        // newButton.classList.add("new-todo-button");
-        // newButton.classList.add("pointer");
-        // newButton.innerHTML = svg.getSvgIcons().addBoxIcon;
-        // headingContainer.appendChild(newButton);
-        // newButton.addEventListener("click", (e) => {
-        //     uiController.openDialog("todo");
-        // })
-
         const heading = document.createElement("div");
         heading.classList.add("heading");
-        heading.textContent = title;
-        headingContainer.appendChild(heading);        
+        heading.textContent = list.title;
+        headingContainer.appendChild(heading);
+
+        const newButton = document.createElement("div");
+        newButton.classList.add("new-todo-button");
+        newButton.classList.add("pointer");
+        newButton.innerHTML = svg.getSvgIcons().addBoxIcon;
+        headingContainer.appendChild(newButton);
+
+        newButton.addEventListener("click", () => {
+            this.activeList = list;
+            this.openDialog("todo");
+            if (list.dateHint) {
+                console.log(list.dateHint);
+                const localDate = new Date(list.dateHint.getFullYear(), list.dateHint.getMonth(), list.dateHint.getDate());
+                this.newTodoDate.valueAsDate = localDate;
+            }
+        });
 
         const ul = document.createElement("ul");
 
-        todos.forEach((todo, index) => {
+        list.todos.forEach((todo, index) => {
             const todoItem = document.createElement("li");
             todoItem.id = `${todo.id}`
 
@@ -165,12 +221,9 @@ class UIController {
 
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
-            checkbox.id = `${title.toLowerCase()}-item-${index}`;
+            checkbox.id = `${list.title.toLowerCase()}-item-${index}`;
             checkbox.name = checkbox.id;
             checkbox.checked = todo.completed;
-            checkbox.addEventListener("click", () => {
-                todo.changeCompletedStatus();
-            })
 
             const label = document.createElement("label");
             label.setAttribute("for", checkbox.id);
@@ -185,10 +238,34 @@ class UIController {
             priority.classList.add("todo-priority");
             priority.textContent = todo.priority;
 
+            if (todo.completed) {
+                label.classList.add("completed-todo-text");
+                date.classList.add("completed-todo-details");
+                priority.classList.add("completed-todo-details");
+            } else {
+                label.classList.remove("completed-todo-text");
+                date.classList.remove("completed-todo-details");
+                priority.classList.remove("completed-todo-details");
+            }
+
+            checkbox.addEventListener("click", () => {
+                todo.changeCompletedStatus();
+                if (todo.completed) {
+                    label.classList.add("completed-todo-text");
+                    date.classList.add("completed-todo-details");
+                    priority.classList.add("completed-todo-details");
+                } else {
+                    label.classList.remove("completed-todo-text");
+                    date.classList.remove("completed-todo-details");
+                    priority.classList.remove("completed-todo-details");
+                }
+            })    
+
             const deleteButton = document.createElement("div");
             deleteButton.classList.add("delete-todo-button");
             deleteButton.classList.add("pointer");
             deleteButton.innerHTML = svg.getSvgIcons().trashIcon;
+
             deleteButton.addEventListener("click", () => {
                 todo.list.deleteTodo(todo.id);
                 rerenderFn();
@@ -221,9 +298,9 @@ class UIController {
             case "project":
                 this.newProjectDialog.showModal();
                 break;
-            /*case "list":
-                this.newListForm.showModal();
-                break;*/
+            case "list":
+                this.newListDialog.showModal();
+                break;
             case "todo":
                 this.newTodoDialog.showModal();
                 break;
@@ -235,9 +312,9 @@ class UIController {
             case "project":
                 this.newProjectDialog.close();
                 break;
-            /*case "list":
-                this.newListForm.close();
-                break;*/
+            case "list":
+                this.newListDialog.close();
+                break;
             case "todo":
                 this.newTodoDialog.close();
                 break;
@@ -249,11 +326,11 @@ class UIController {
             case "project":
                 this.newProjectForm.reset();
                 break;
-            /*case "list":
+            case "list":
                 this.newListForm.reset();
-                break;*/
+                break;
             case "todo":
-                this.newTodoDialog.reset();
+                this.newTodoForm.reset();
                 break;
         } 
     }
@@ -261,7 +338,37 @@ class UIController {
     setUpEventListeners() { 
         this.newProject.addEventListener("click", (e) => {
             this.openDialog("project");
+        })        
+
+        this.createProjectButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            const title = this.newProjectTitle.value;
+            const description = this.newProjectDesc.value;
+            appController.createProject(title, description);
+            this.clearForm("project");
         })
+
+        this.createListButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            const title = this.newListTitle.value;
+            const project = appController.getActiveProject();
+            project.createList(title, project);
+            this.clearForm("list");
+            this.closeDialog("list");
+            this.rerenderPage();
+        })        
+
+        this.createTodoButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            const description = this.newTodoDesc.value;
+            const date = this.newTodoDate.valueAsDate;
+            const priority = parseInt(this.newTodoPriority.value);
+
+            this.activeList.createTodo(description, date, priority);
+            this.clearForm("todo");
+            this.closeDialog("todo");
+            this.rerenderPage();
+        });
 
         this.closeProjectButton.addEventListener("click", (e) => {
             e.preventDefault();
@@ -269,15 +376,15 @@ class UIController {
             this.clearForm("project");
         })
 
-        this.createProjectButton.addEventListener("click", (e) => {
+        this.closeListButton.addEventListener("click", (e) => {
             e.preventDefault();
-            appController.createProject(this.newProjectTitle.value, this.newProjectDesc.value);
-            this.clearForm("project");
+            this.closeDialog("list");
+            this.clearForm("list");
         })
 
-        this.createTodoButton.addEventListener("click", (e) => {
+        this.closeTodoButton.addEventListener("click", (e) => {
             e.preventDefault();
-            appController.createTodo(this.newTodoDesc.value, this.newTodoDate.value, this.newTodoPriority.value)
+            this.closeDialog("todo");
             this.clearForm("todo");
         })
 
@@ -285,6 +392,11 @@ class UIController {
             appController.switchPage();
         })
     }
+
+    // addCssClass(elementName, className) {
+    //     const element = this.elementName;
+    //     this.element.classList.add(`${className}`);
+    // }
 }
 
 export const uiController = new UIController();

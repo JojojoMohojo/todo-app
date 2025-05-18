@@ -23,5 +23,6 @@ export class Todo {
 
     changeCompletedStatus() {
         this.completed = !this.completed;
+        // uiController.addCssClass("todo", this.id, "completed");
     }
 }

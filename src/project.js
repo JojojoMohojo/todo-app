@@ -5,7 +5,7 @@ export class Project {
         this.id = crypto.randomUUID();
         this.title = title;
         this.description = description;
-        this.lists = [new List("Default", this)];
+        this.lists = [];
     }
 
     changeTitle(newTitle) {
