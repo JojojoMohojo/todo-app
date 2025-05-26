@@ -6,6 +6,7 @@ import { VirtualList } from "./virtual-list";
 class UIController {
     constructor() {
         this.content = document.querySelector(".content");
+        this.titleIcon = document.querySelector(".title-icon");
         this.pageTitle = document.querySelector(".page-title")
 
         //Side bar
@@ -77,7 +78,9 @@ class UIController {
 
         const description = document.createElement("div");
         description.classList.add("nav-project-desc");
-        description.innerHTML = project.description;
+        project.description.length <= 70 ?
+            description.innerHTML = project.description :
+            description.innerHTML = project.description.slice(0, 70) + "...";
 
         projectContainer.addEventListener("click", () => {
             appController.switchPage(project);
@@ -92,6 +95,7 @@ class UIController {
 
     renderHomePage() {
         this.pageTitle.textContent= "Home";
+        this.titleIcon.innerHTML = svg.getSvgIcons().homeIcon;
         this.clearContent();
 
         const projects = appController.getProjects();
@@ -135,6 +139,7 @@ class UIController {
     renderProjectPage() {
         const project = appController.getActiveProject();
         this.pageTitle.textContent = project.title;
+        this.titleIcon.innerHTML = svg.getSvgIcons().projectIcon;
         this.clearContent();
 
         const description = document.createElement("div");
@@ -192,23 +197,36 @@ class UIController {
         const heading = document.createElement("div");
         heading.classList.add("heading");
         heading.textContent = list.title;
-        headingContainer.appendChild(heading);
+        headingContainer.appendChild(heading);        
 
-        const newButton = document.createElement("div");
-        newButton.classList.add("new-todo-button");
-        newButton.classList.add("pointer");
-        newButton.innerHTML = svg.getSvgIcons().addBoxIcon;
-        headingContainer.appendChild(newButton);
+        if (!list.isVirtual) {
+            const newButton = document.createElement("div");
+            newButton.classList.add("new-todo-button");
+            newButton.classList.add("pointer");
+            newButton.innerHTML = svg.getSvgIcons().addBoxIcon;
+            headingContainer.appendChild(newButton);
 
-        newButton.addEventListener("click", () => {
-            this.activeList = list;
-            this.openDialog("todo");
-            if (list.dateHint) {
-                console.log(list.dateHint);
-                const localDate = new Date(list.dateHint.getFullYear(), list.dateHint.getMonth(), list.dateHint.getDate());
-                this.newTodoDate.valueAsDate = localDate;
-            }
-        });
+            newButton.addEventListener("click", () => {
+                this.activeList = list;
+                this.openDialog("todo");
+                if (list.dateHint) {
+                    console.log(list.dateHint);
+                    const localDate = new Date(list.dateHint.getFullYear(), list.dateHint.getMonth(), list.dateHint.getDate());
+                    this.newTodoDate.valueAsDate = localDate;
+                }
+            });
+            
+            const deleteListButton = document.createElement("div");
+            deleteListButton.classList.add("delete-list-button");
+            deleteListButton.classList.add("pointer");
+            deleteListButton.innerHTML = svg.getSvgIcons().trashIcon;
+            headingContainer.appendChild(deleteListButton);
+
+            deleteListButton.addEventListener("click", () => {
+                list.project.deleteList(list.id);
+                rerenderFn();
+            })
+        }
 
         const ul = document.createElement("ul");
 
@@ -224,19 +242,125 @@ class UIController {
             checkbox.id = `${list.title.toLowerCase()}-item-${index}`;
             checkbox.name = checkbox.id;
             checkbox.checked = todo.completed;
+            container.appendChild(checkbox);
 
             const label = document.createElement("label");
             label.setAttribute("for", checkbox.id);
             label.textContent = todo.description;
+
+            label.addEventListener("dblclick", () => {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.value = todo.description;
+                input.classList.add("todo-edit-input");
+                input.classList.add("todo-edit-label-input");
+
+                // Clone label to measure width
+                const labelClone = label.cloneNode(true);
+                labelClone.style.visibility = "hidden";
+                labelClone.style.position = "absolute";
+                labelClone.style.whiteSpace = "pre";
+                labelClone.style.fontSize = getComputedStyle(label).fontSize;
+                labelClone.style.fontFamily = getComputedStyle(label).fontFamily;
+                document.body.appendChild(labelClone);
+
+                // Match initial input width to label's width
+                const labelWidth = labelClone.offsetWidth;
+                input.style.width = `${labelWidth + 10}px`; // +10 for padding buffer
+                document.body.removeChild(labelClone);
+
+                // Add listener to auto-resize as user types
+                input.addEventListener("input", () => {
+                    mirror.textContent = input.value || " "; // Avoid 0 width on empty string
+                    input.style.width = `${mirror.offsetWidth + 10}px`;
+                });
+
+                // Create hidden mirror span for live resizing
+                const mirror = document.createElement("span");
+                mirror.style.position = "absolute";
+                mirror.style.visibility = "hidden";
+                mirror.style.whiteSpace = "pre";
+                mirror.style.fontSize = getComputedStyle(label).fontSize;
+                mirror.style.fontFamily = getComputedStyle(label).fontFamily;
+                document.body.appendChild(mirror);
+
+                label.replaceWith(input);
+                input.focus();
+
+                const commitEdit = () => {
+                    todo.changeDescription(input.value);
+                    this.rerenderPage();
+                    document.body.removeChild(mirror);
+                };
+
+                input.addEventListener("blur", commitEdit);
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") input.blur();
+                });
+            });
+
+            container.appendChild(label);
 
             const date = document.createElement("div");
             date.classList.add("todo-date");
             const formattedDate = format(todo.dueDate, "dd MMM yyyy");
             date.textContent = formattedDate;
 
+            date.addEventListener("dblclick", () => {
+                const input = document.createElement("input");
+                input.type = "date";
+                input.valueAsDate = todo.dueDate;
+                input.classList.add("todo-edit-input");
+                input.classList.add("todo-edit-date-input");
+
+                date.replaceWith(input);
+                input.focus();
+
+                const commitEdit = () => {
+                    const newDate = input.valueAsDate;
+                    if (newDate) {
+                        todo.changeDueDate(newDate);
+                    }
+                    this.rerenderPage();
+                };
+
+                input.addEventListener("blur", commitEdit);
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") input.blur();
+                });
+            });
+            container.appendChild(date);
+
             const priority = document.createElement("div");
             priority.classList.add("todo-priority");
             priority.textContent = todo.priority;
+
+            priority.addEventListener("dblclick", () => {
+                const input = document.createElement("input");
+                input.type = "number";
+                input.min = 1;
+                input.max = 5;
+                input.value = todo.priority;
+                input.classList.add("todo-edit-input");
+                input.classList.add("todo-edit-priority-input");
+
+                priority.replaceWith(input);
+                input.focus();
+
+                const commitEdit = () => {
+                    const newPriority = parseInt(input.value);
+                    if (!isNaN(newPriority)) {
+                        todo.changePriority(newPriority);
+                    }
+                    this.rerenderPage();
+                };
+
+                input.addEventListener("blur", commitEdit);
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") input.blur();
+                });
+            });
+            container.appendChild(priority);
 
             if (todo.completed) {
                 label.classList.add("completed-todo-text");
@@ -261,21 +385,17 @@ class UIController {
                 }
             })    
 
-            const deleteButton = document.createElement("div");
-            deleteButton.classList.add("delete-todo-button");
-            deleteButton.classList.add("pointer");
-            deleteButton.innerHTML = svg.getSvgIcons().trashIcon;
+            const deleteTodoButton = document.createElement("div");
+            deleteTodoButton.classList.add("delete-todo-button");
+            deleteTodoButton.classList.add("pointer");
+            deleteTodoButton.innerHTML = svg.getSvgIcons().trashIcon;
+            container.appendChild(deleteTodoButton);
 
-            deleteButton.addEventListener("click", () => {
+            deleteTodoButton.addEventListener("click", () => {
                 todo.list.deleteTodo(todo.id);
                 rerenderFn();
             })
 
-            container.appendChild(checkbox);
-            container.appendChild(label);
-            container.appendChild(date);
-            container.appendChild(priority);
-            container.appendChild(deleteButton);
             todoItem.appendChild(container);
             ul.appendChild(todoItem);
         });

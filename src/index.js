@@ -23,7 +23,6 @@ function createDummyTodos() {
     appController.projects[1].lists[0].createTodo("Weigh myself every day", new Date("2025-05-19"), 2, appController.projects[1].lists[0]);
     appController.projects[1].lists[0].createTodo("Don't eat too much food", new Date("2025-04-30"), 3, appController.projects[1].lists[0]);
     appController.projects[1].lists[1].createTodo("Maintain protein intake", new Date("2025-04-05"), 2, appController.projects[1].lists[1]);
-    appController.projects[1].lists[1].createTodo("Weigh myself every day", new Date("2025-05-19"), 1, appController.projects[1].lists[1]);
     appController.projects[1].lists[1].createTodo("Measure body fat percentage every week", new Date("2025-05-16"), 3, appController.projects[1].lists[1]);
     appController.projects[1].lists[1].createTodo("Decrease calorie intake as time progresses", new Date("2025-06-29"), 5, appController.projects[1].lists[1]);
 }
