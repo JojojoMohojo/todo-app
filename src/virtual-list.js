@@ -9,16 +9,16 @@ export class VirtualList{
         this.isVirtual = true;
     }
 
-    changeTitle(newTitle) {
-        this.title = newTitle;
-    }
+    // changeTitle(newTitle) {
+    //     this.title = newTitle;
+    // }
 
-    createTodo(description, dueDate, priority) {
-        const todo = new Todo(description, dueDate, priority, this);
-        this.todos.push(todo);
-    }
+    // createTodo(description, dueDate, priority) {
+    //     const todo = new Todo(description, dueDate, priority, this);
+    //     this.todos.push(todo);
+    // }
 
-    deleteTodo(todoId) {
-        this.todos = this.todos.filter(todo => todo.id !== todoId);
-    }
+    // deleteTodo(todoId) {
+    //     this.todos = this.todos.filter(todo => todo.id !== todoId);
+    // }
 }

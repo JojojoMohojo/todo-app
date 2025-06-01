@@ -147,6 +147,59 @@ class UIController {
         description.textContent = project.description;
         this.content.appendChild(description);
 
+        description.addEventListener("dblclick", () => {
+            const textarea = document.createElement("textarea");
+            textarea.value = project.description;
+            textarea.classList.add("edit-input");
+            textarea.classList.add("desc-edit-input");
+            textarea.style.height = "auto";
+            textarea.style.overflow = "hidden";
+            textarea.style.resize = "none";
+            textarea.style.boxSizing = "border-box";
+            textarea.value = project.description;
+            textarea.style.height = `${textarea.scrollHeight}px`;
+
+            textarea.addEventListener("input", () => {
+                textarea.style.height = "auto";
+                textarea.style.height = `${textarea.scrollHeight}px`;
+            });
+
+            // Clone to measure initial size
+            const descriptionClone = description.cloneNode(true);
+            descriptionClone.style.visibility = "hidden";
+            descriptionClone.style.position = "absolute";
+            descriptionClone.style.whiteSpace = "pre-wrap";
+            descriptionClone.style.fontSize = getComputedStyle(description).fontSize;
+            descriptionClone.style.fontFamily = getComputedStyle(description).fontFamily;
+            descriptionClone.style.lineHeight = getComputedStyle(description).lineHeight;
+            descriptionClone.style.width = getComputedStyle(description).width;
+            descriptionClone.style.padding = getComputedStyle(description).padding;
+            descriptionClone.textContent = project.description;
+            document.body.appendChild(descriptionClone);
+
+            textarea.style.width = `${descriptionClone.offsetWidth}px`;
+            textarea.style.height = `${descriptionClone.offsetHeight + 5}px`;
+
+            document.body.removeChild(descriptionClone);
+
+            description.replaceWith(textarea);
+            textarea.focus();
+
+            const commitEdit = () => {
+                debugger;
+                project.changeDescription(textarea.value);
+                this.rerenderPage();
+            };
+
+            textarea.addEventListener("blur", commitEdit);
+            textarea.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault(); // prevent line break
+                    textarea.blur();
+                }
+            });
+        });
+
         const newListContainer = document.createElement("div");
         newListContainer.classList.add("new-list-container");
         newListContainer.classList.add("pointer");
@@ -252,7 +305,7 @@ class UIController {
                 const input = document.createElement("input");
                 input.type = "text";
                 input.value = todo.description;
-                input.classList.add("todo-edit-input");
+                input.classList.add("edit-input");
                 input.classList.add("todo-edit-label-input");
 
                 // Clone label to measure width
@@ -266,12 +319,12 @@ class UIController {
 
                 // Match initial input width to label's width
                 const labelWidth = labelClone.offsetWidth;
-                input.style.width = `${labelWidth + 10}px`; // +10 for padding buffer
+                input.style.width = `${labelWidth + 10}px`;
                 document.body.removeChild(labelClone);
 
                 // Add listener to auto-resize as user types
                 input.addEventListener("input", () => {
-                    mirror.textContent = input.value || " "; // Avoid 0 width on empty string
+                    mirror.textContent = input.value || " ";
                     input.style.width = `${mirror.offsetWidth + 10}px`;
                 });
 
@@ -310,7 +363,7 @@ class UIController {
                 const input = document.createElement("input");
                 input.type = "date";
                 input.valueAsDate = todo.dueDate;
-                input.classList.add("todo-edit-input");
+                input.classList.add("edit-input");
                 input.classList.add("todo-edit-date-input");
 
                 date.replaceWith(input);
@@ -341,7 +394,7 @@ class UIController {
                 input.min = 1;
                 input.max = 5;
                 input.value = todo.priority;
-                input.classList.add("todo-edit-input");
+                input.classList.add("edit-input");
                 input.classList.add("todo-edit-priority-input");
 
                 priority.replaceWith(input);
@@ -512,11 +565,6 @@ class UIController {
             appController.switchPage();
         })
     }
-
-    // addCssClass(elementName, className) {
-    //     const element = this.elementName;
-    //     this.element.classList.add(`${className}`);
-    // }
 }
 
 export const uiController = new UIController();
