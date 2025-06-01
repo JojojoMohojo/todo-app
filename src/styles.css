@@ -400,6 +400,13 @@ svg {
   gap: 15px;
 }
 
+.list-edit-input {
+  font-size: 2rem;
+  width: auto;
+  max-width: 100%;
+  padding: 0px 8px;
+}
+
 .todo-date,
 .todo-priority {
   font-size: 1rem;
@@ -440,7 +447,6 @@ svg {
 .list-item-container:hover .delete-todo-button svg {
   fill: var(--jet-black);
 }
-
 
 .todo-edit-label-input {
   font-size: 1.3rem;

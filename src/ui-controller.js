@@ -152,17 +152,8 @@ class UIController {
             textarea.value = project.description;
             textarea.classList.add("edit-input");
             textarea.classList.add("desc-edit-input");
-            textarea.style.height = "auto";
-            textarea.style.overflow = "hidden";
-            textarea.style.resize = "none";
-            textarea.style.boxSizing = "border-box";
-            textarea.value = project.description;
-            textarea.style.height = `${textarea.scrollHeight}px`;
-
-            textarea.addEventListener("input", () => {
-                textarea.style.height = "auto";
-                textarea.style.height = `${textarea.scrollHeight}px`;
-            });
+            textarea.style.margin = 0;
+            textarea.style.padding = getComputedStyle(description).padding;
 
             // Clone to measure initial size
             const descriptionClone = description.cloneNode(true);
@@ -279,6 +270,55 @@ class UIController {
                 list.project.deleteList(list.id);
                 rerenderFn();
             })
+
+            heading.addEventListener("dblclick", () => {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.value = list.title;
+                input.classList.add("edit-input");
+                input.classList.add("list-edit-input");
+
+                // Clone to measure original width
+                const headingClone = heading.cloneNode(true);
+                headingClone.style.visibility = "hidden";
+                headingClone.style.position = "absolute";
+                headingClone.style.whiteSpace = "pre";
+                headingClone.style.fontSize = getComputedStyle(heading).fontSize;
+                headingClone.style.fontFamily = getComputedStyle(heading).fontFamily;
+                document.body.appendChild(headingClone);
+
+                const headingWidth = headingClone.offsetWidth;
+                input.style.width = `${headingWidth + 25}px`;
+                document.body.removeChild(headingClone);
+
+                // Live resizing mirror
+                const mirror = document.createElement("span");
+                mirror.style.position = "absolute";
+                mirror.style.visibility = "hidden";
+                mirror.style.whiteSpace = "pre";
+                mirror.style.fontSize = getComputedStyle(heading).fontSize;
+                mirror.style.fontFamily = getComputedStyle(heading).fontFamily;
+                document.body.appendChild(mirror);
+
+                input.addEventListener("input", () => {
+                    mirror.textContent = input.value || " ";
+                    input.style.width = `${mirror.offsetWidth + 10}px`;
+                });
+
+                heading.replaceWith(input);
+                input.focus();
+
+                const commitEdit = () => {
+                    list.changeTitle(input.value);
+                    this.rerenderPage();
+                    document.body.removeChild(mirror);
+                };
+
+                input.addEventListener("blur", commitEdit);
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") input.blur();
+                });
+            });
         }
 
         const ul = document.createElement("ul");
