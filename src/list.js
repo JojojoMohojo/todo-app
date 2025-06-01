@@ -1,3 +1,4 @@
+import { appController } from "./app-controller.js";
 import { Todo } from "./todo.js";
 
 export class List {
@@ -11,14 +12,17 @@ export class List {
 
     changeTitle(newTitle) {
         this.title = newTitle;
+        if (appController.getIsLocalStorageActive()) appController.saveToStorage();
     }
 
     createTodo(description, dueDate, priority) {
         const todo = new Todo(description, dueDate, priority, this);
         this.todos.push(todo);
+        if (appController.getIsLocalStorageActive()) appController.saveToStorage();
     }
 
     deleteTodo(todoId) {
         this.todos = this.todos.filter(todo => todo.id !== todoId);
+        if (appController.getIsLocalStorageActive()) appController.saveToStorage();
     }
 }

@@ -7,6 +7,15 @@ class AppController {
     constructor() {
         this.projects = [];
         this.activeProject = null;
+        this.isLocalStorageActive = false;
+    }
+
+    getIsLocalStorageActive() {
+        return this.isLocalStorageActive;
+    }
+
+    setIsLocalStorageActive(result) {
+        result ? this.isLocalStorageActive = true : this.isLocalStorageActive = false;
     }
 
     getProjects() {
@@ -32,7 +41,7 @@ class AppController {
         const project = new Project(title, description);
         this.projects.push(project);
         uiController.renderProjectsList(this.projects);
-        this.setActiveProject(project.id);
+        this.setActiveProject(project);
         uiController.closeDialog("project");
     }
 
@@ -49,12 +58,31 @@ class AppController {
         }
     }   
     
-    saveToStorage() { 
-        // TBC
+    saveToStorage() {
+        const projectsCopy = this.projects.map(project => {
+            const projCopy = {
+                ...project,
+                lists: project.lists.map(list => {
+                    const listCopy = {
+                        ...list,
+                        todos: list.todos.map(todo => {
+                            const { list, ...todoCopy } = todo;
+                            return todoCopy;
+                        })
+                    };
+                    delete listCopy.project;
+                    return listCopy;
+                })
+            };
+            return projCopy;
+        });
+
+        localStorage.setItem("projects", JSON.stringify(projectsCopy));
     }
 
-    loadFromStorage() { 
-        // TBC
+    loadFromStorage() {
+        const data = JSON.parse(localStorage.getItem("projects"));
+        this.projects = Array.isArray(data) ? data : [];
     }
 }
 

@@ -1,3 +1,5 @@
+import { appController } from "./app-controller.js";
+
 export class Todo {
     constructor(description, dueDate, priority, list) {
         this.id = crypto.randomUUID();
@@ -11,18 +13,21 @@ export class Todo {
 
     changeDescription(newDescription) {
         this.description = newDescription;
+        if (appController.getIsLocalStorageActive()) appController.saveToStorage();
     }
 
     changeDueDate(newDate) {
         this.dueDate = newDate;
+        if (appController.getIsLocalStorageActive()) appController.saveToStorage();
     }
     
     changePriority(newPriority) {
         this.priority = newPriority;
+        if (appController.getIsLocalStorageActive()) appController.saveToStorage();
     }
 
     changeCompletedStatus() {
         this.completed = !this.completed;
-        // uiController.addCssClass("todo", this.id, "completed");
+        if (appController.getIsLocalStorageActive()) appController.saveToStorage();
     }
 }

@@ -177,7 +177,6 @@ class UIController {
             textarea.focus();
 
             const commitEdit = () => {
-                debugger;
                 project.changeDescription(textarea.value);
                 this.rerenderPage();
             };
