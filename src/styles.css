@@ -4,13 +4,17 @@
 :root {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  --jet-black: #2A2B2A;
+  --black: #000000;
   --white: #ffffff;
   --uranian-blue: #BDE0FE;
-  --grey: #b9b9b9;
+  --grey: #a3a3a3;
+  --light-grey: #ebebeb;
   --thistle: #CDB4DB;
   --fairy-tale: #FFC8DD;
-  --mint-green: #5DFFD9;
+  --aquamarine: #7AEBAE;
+  --darker-aquamarine: #78e0a9;
+  --mindaro: #ECFEAA;
+  --blue: #5298F7;
 }
 
 h1, h2, h3, h4, h5, figure, p, ol, ul {
@@ -121,15 +125,14 @@ textarea {
 .sidebar {
   position: fixed;
   height: 100vh;
-  width: 320px;
+  width: 350px;
   display: flex;
   flex-direction: column;
   flex: 1;
-  color: var(--jet-black);
+  color: var(--black);
   background-color: var(--uranian-blue);
   font-size: 1.4rem;
-  padding: 1rem;
-  border-right: solid 4px var(--jet-black);
+  border-right: solid 4px var(--black);
   z-index: 1000;
 }
 
@@ -144,8 +147,8 @@ nav {
   display: flex;
   justify-content: center;
   position: relative;
-  height: 100px;
-  margin: 0px 0 45px 0;
+  height: 125px;
+  padding: 10px;
 }
 
 .logo {
@@ -156,12 +159,12 @@ nav {
 .logo-wrapper::after {
   content: "";
   position: absolute;
-  bottom: -27px;
+  bottom: -1px;
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
   height: 4px;
-  background-color: var(--jet-black);
+  background-color: var(--black);
   border-radius: 20px;
 }
 
@@ -172,6 +175,10 @@ nav {
   margin-bottom: 0px;
 }
 
+.link {
+  height: 100px;
+}
+
 .nav-icon {
   height: 1.6rem;
   align-self: center;
@@ -179,44 +186,83 @@ nav {
   margin: 0;
 }
 
+.nav-home,
+.nav-new-project {
+  display: flex;
+  height: 66px;
+  font-size: 1.7rem;
+  padding-left: 1rem;
+  align-items: center;
+}
+
 .nav-home > .nav-home-icon,
 .nav-new-project > .new-project-icon {
-  margin-right: 12px;
-}
-
-.nav-home {
-  display: flex;
-  margin-bottom: 20px;
-}
-
-.home-button {
-  font-size: 1.6rem;
+  height: 2rem;
+  margin-right: 6px;
 }
 
 .nav-new-project {
-  display: flex;
-  margin-bottom: 20px;
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.nav-new-project::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 4px;
+  background-color: var(--black);
+  border-radius: 20px;
 }
 
 .project-container {
   display: grid;
-  grid-template-columns: 1.8rem auto;
-  grid-template-rows: 1.8rem auto;
+  height: 66px;
+  grid-template-columns: 1.8rem auto auto;
+  grid-template-rows: 1.8rem auto auto;
   column-gap: 10px;
   row-gap: 2px;
   align-items: center;
-  margin-bottom: 20px;
+  padding: 0.3rem 0 01rem 1rem;
 }
 
 .active-project {
-  outline: dotted 3px var(--white);
-  outline-offset: 5px;
-  border-radius: 0.5rem;
+  background-color: var(--aquamarine);
+  color: var(--black);
 }
 
-.nav-project-icon {
-  display: flex;
-  height: 1.4rem;
+.active-project .nav-delete-icon svg {
+  fill: var(--aquamarine);
+}
+
+.nav-delete-icon {
+  align-self: end;
+  justify-self: end;
+}
+
+.nav-delete-icon svg {
+  fill: var(--uranian-blue);
+  transition: fill 0.5s ease;
+  cursor: pointer;
+}
+
+.project:hover .nav-project-name,
+.project:hover .nav-project-desc {
+  color: var(--black);
+}
+
+.project:hover .nav-project-icon svg,
+.project:hover .nav-delete-icon svg {
+  fill: var(--black);
+}
+
+.nav-home:hover,
+.nav-new-project:hover,
+.project:hover {
+  background-color: var(--blue);
 }
 
 .nav-project-desc {
@@ -236,7 +282,7 @@ nav {
 }
 
 .main {
-  margin-left: 320px;
+  margin-left: 350px;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -252,21 +298,27 @@ nav {
 
 .header {
   display: flex;
+  height: 125px;
+  align-items: center;
   position: sticky;
   top: 0;
   background-color: var(--white);
   z-index: 999;
-  padding: 20px 0px 20px 30px;
+  padding: 0 0 0 30px;
   margin-bottom: 20px;
+}
+
+.header-container {
+  display: flex;
 }
 
 .title-icon {
   height: 4.5rem;
-  margin: 5px 10px 0 0;
+  margin: 10px 10px 0 0;
 }
 
 .page-title {
-  color: var(--jet-black);
+  color: var(--black);
 }
 
 .header::after {
@@ -277,7 +329,7 @@ nav {
   transform: translateX(-50%);
   width: 95%;
   height: 4px;
-  background-color: var(--jet-black);
+  background-color: var(--black);
   border-radius: 20px;
 }
 
@@ -296,7 +348,7 @@ nav {
 .edit-input {
   font-family: inherit;
   font-size: 1rem;
-  color: var(--jet-black);
+  color: var(--black);
   background-color: var(--white);
   border: 2px solid var(--grey);
   border-radius: 5px;
@@ -330,9 +382,13 @@ textarea.desc-edit-input {
   justify-content: center;
   align-items: center;
   font-size: 1.6rem;
-  background-color: var(--mint-green);
+  background-color: var(--aquamarine);
   border-radius: 25px;
   margin: 20px 0 20px 0;
+}
+
+.new-list-container:hover {
+  background-color: var(--darker-aquamarine);
 }
 
 .new-list-button,
@@ -430,7 +486,7 @@ svg {
 .completed-todo-details {
   text-decoration: line-through;
   color: var(--grey);
-  background-color: var(--mint-green);
+  background-color: var(--aquamarine);
 }
 
 .new-todo-button svg,
@@ -444,7 +500,7 @@ svg {
 .heading-container:hover .new-todo-button svg,
 .heading-container:hover .delete-list-button svg,
 .list-item-container:hover .delete-todo-button svg {
-  fill: var(--jet-black);
+  fill: var(--black);
 }
 
 .todo-edit-label-input {
@@ -469,15 +525,15 @@ svg {
 .new-todo-dialog {
   position: fixed;
   top: 25%;
-  left: calc(320px + (((100vw / 6) * 5) / 2));
+  left: calc(350px + (((100vw / 6) * 5) / 2));
   transform: translate(-50%);
   width: 500px;
   padding: 10px 20px 25px 20px;
   margin: 0;
   font-size: 1.2rem;
   background-color: var(--thistle);
-  color: var(--jet-black);
-  border: solid 4px var(--jet-black);
+  color: var(--black);
+  border: solid 4px var(--black);
   border-radius: 20px;
   z-index: 2000;
 

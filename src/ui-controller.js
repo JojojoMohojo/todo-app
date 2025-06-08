@@ -66,15 +66,25 @@ class UIController {
         const projectContainer = document.createElement("div");
         projectContainer.classList.add("project-container");
 
-        const icon = document.createElement("div");
-        icon.classList.add("nav-project-icon");
-        icon.classList.add("nav-icon");
-        icon.innerHTML = svg.getSvgIcons().projectIcon;
+        const projectIcon = document.createElement("div");
+        projectIcon.classList.add("nav-project-icon");
+        projectIcon.classList.add("nav-icon");
+        projectIcon.innerHTML = svg.getSvgIcons().projectIcon;
 
         const name = document.createElement("div");
         name.classList.add("nav-project-name");
         name.classList.add("bold");
         name.innerHTML = project.title;
+
+        const deleteIcon = document.createElement("div");
+        deleteIcon.classList.add("nav-delete-icon");
+        deleteIcon.classList.add("nav-icon");
+        deleteIcon.innerHTML = svg.getSvgIcons().trashIcon;
+
+        deleteIcon.addEventListener("click", () => {
+            appController.deleteProject(project.id);
+            console.log("click");
+        });
 
         const description = document.createElement("div");
         description.classList.add("nav-project-desc");
@@ -86,8 +96,9 @@ class UIController {
             appController.switchPage(project);
         });
 
-        projectContainer.appendChild(icon);
+        projectContainer.appendChild(projectIcon);
         projectContainer.appendChild(name);
+        projectContainer.appendChild(deleteIcon);
         projectContainer.appendChild(description);
         newProject.appendChild(projectContainer);
         this.projectList.appendChild(newProject);
@@ -104,8 +115,6 @@ class UIController {
 
         const tomorrowDate = new Date(todayDate);
         tomorrowDate.setDate(todayDate.getDate() + 1);
-        console.log(todayDate);
-        console.log(tomorrowDate);
 
         let dueTodos = [];
         let tomorrowTodos = [];
@@ -253,7 +262,6 @@ class UIController {
                 this.activeList = list;
                 this.openDialog("todo");
                 if (list.dateHint) {
-                    console.log(list.dateHint);
                     const localDate = new Date(list.dateHint.getFullYear(), list.dateHint.getMonth(), list.dateHint.getDate());
                     this.newTodoDate.valueAsDate = localDate;
                 }
