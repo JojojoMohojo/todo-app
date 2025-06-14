@@ -5,7 +5,6 @@ import { uiController } from "./ui-controller.js";
 uiController.setUpEventListeners();
 // Check if local storage is available and load it if so
 appController.setIsLocalStorageActive(storageAvailable("localStorage"));
-console.log(appController.getIsLocalStorageActive());
 if (appController.getIsLocalStorageActive()) appController.loadFromStorage();
 
 function storageAvailable(type) {
@@ -52,6 +51,7 @@ function createDummyTodos() {
     appController.projects[1].lists[1].createTodo("Measure body fat percentage every week", new Date("2025-05-16"), 3, appController.projects[1].lists[1]);
     appController.projects[1].lists[1].createTodo("Decrease calorie intake as time progresses", new Date("2025-06-29"), 5, appController.projects[1].lists[1]);
 }
+
 // End of temporary functions
 uiController.renderProjectsList();
 appController.switchPage();

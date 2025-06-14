@@ -47,6 +47,12 @@ class AppController {
 
     deleteProject(projectId) { 
         this.projects = this.projects.filter(project => project.id !== projectId);
+
+        if (projectId === this.activeProject.id) {
+            this.switchPage();
+        }
+        if (this.getIsLocalStorageActive()) this.saveToStorage();
+        uiController.renderProjectsList();
     }
 
     switchPage(project) {
@@ -81,9 +87,46 @@ class AppController {
     }
 
     loadFromStorage() {
-        const data = JSON.parse(localStorage.getItem("projects"));
-        this.projects = Array.isArray(data) ? data : [];
+        const rawData = JSON.parse(localStorage.getItem("projects"));
+        if (!Array.isArray(rawData)) {
+            this.projects = [];
+            return;
+        }
+
+        const restoredProjects = rawData.map(projectData => {
+            const project = new Project(projectData.title, projectData.description);
+            project.id = projectData.id;
+
+            projectData.lists.forEach(listData => {
+                const list = new List(listData.title, project);
+                list.id = listData.id;
+
+                listData.todos.forEach(todoData => {
+                    const todo = new Todo(
+                        todoData.description,
+                        todoData.dueDate ? new Date(todoData.dueDate) : null,
+                        todoData.priority,
+                        list
+                    );
+                    todo.id = todoData.id;
+                    todo.completed = todoData.completed;
+                    list.todos.push(todo);
+                });
+
+                project.lists.push(list);
+            });
+
+            return project;
+        });
+
+        this.projects = restoredProjects;
     }
+
+    validateProjectForm() {
+
+    }
+
+    
 }
 
 export const appController = new AppController();
