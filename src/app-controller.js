@@ -121,6 +121,12 @@ class AppController {
 
         this.projects = restoredProjects;
     }
+
+    validateProjectForm() {
+
+    }
+
+    
 }
 
 export const appController = new AppController();

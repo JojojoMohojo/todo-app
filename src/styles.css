@@ -133,7 +133,7 @@ textarea {
   background-color: var(--uranian-blue);
   font-size: 1.4rem;
   border-right: solid 4px var(--black);
-  z-index: 1000;
+  z-index: 100;
 }
 
 nav {
@@ -220,13 +220,13 @@ nav {
 
 .project-container {
   display: grid;
-  height: 66px;
+  height: 68px;
   grid-template-columns: 1.8rem auto auto;
   grid-template-rows: 1.8rem auto auto;
   column-gap: 10px;
   row-gap: 2px;
   align-items: center;
-  padding: 0.3rem 0 01rem 1rem;
+  padding: 0.5rem 0 0.1rem 1rem;
 }
 
 .active-project {
@@ -303,7 +303,7 @@ nav {
   position: sticky;
   top: 0;
   background-color: var(--white);
-  z-index: 999;
+  z-index: 100;
   padding: 0 0 0 30px;
   margin-bottom: 20px;
 }
@@ -351,13 +351,13 @@ nav {
   color: var(--black);
   background-color: var(--white);
   border: 2px solid var(--grey);
-  border-radius: 5px;
+  border-radius: 10px;
   outline: none;
   width: auto;
   min-width: 0;
 }
 
-textarea.desc-edit-input {
+textarea#desc-edit-input {
   margin: 0;
   padding: 0 6px;
   font-size: 1.4rem;
@@ -367,7 +367,7 @@ textarea.desc-edit-input {
   box-sizing: border-box;
 }
 
-.desc-edit-input {
+#desc-edit-input {
   max-width: 50%;
   font-size: 1.4rem;
   margin-bottom: 0px;
@@ -383,7 +383,7 @@ textarea.desc-edit-input {
   align-items: center;
   font-size: 1.6rem;
   background-color: var(--aquamarine);
-  border-radius: 25px;
+  border-radius: 10px;
   margin: 20px 0 20px 0;
 }
 
@@ -399,13 +399,17 @@ textarea.desc-edit-input {
   align-self: center;
 }
 
-.empty {
+.no-lists {
   font-size: 1.6rem;
 }
 
 .section {
   margin-bottom: 70px;
   position: relative;
+}
+
+.no-todos {
+  font-size: 1.4rem;
 }
 
 svg {
@@ -525,7 +529,7 @@ svg {
 .new-todo-dialog {
   position: fixed;
   top: 25%;
-  left: calc(350px + (((100vw / 6) * 5) / 2));
+  left: 50%;
   transform: translate(-50%);
   width: 500px;
   padding: 10px 20px 25px 20px;
@@ -535,7 +539,7 @@ svg {
   color: var(--black);
   border: solid 4px var(--black);
   border-radius: 20px;
-  z-index: 2000;
+  z-index: 50;
 
 }
 
@@ -555,9 +559,15 @@ fieldset {
 }
 
 .form-row {
+  position: relative;
   width: 100%;
   padding: 0;
   margin-bottom: 15px;
+  min-height: 60px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 label {
@@ -565,10 +575,11 @@ label {
   display: block;
 }
 
-input {
+input, select, textarea {
   width: 100%;
-  padding: 0 5px 0 5px;
+  padding: 5px 10px 5px 10px;
   font-size: 1.4rem;
+  border-radius: 10px;
 }
 
 .new-project-form-buttons,
@@ -600,34 +611,29 @@ button:hover {
   background: rgba(0, 0, 0, 0.3);
 }
 
-
-/*.projects {
-  flex: 1;
-  height: 100vh;
-  min-width: 450px;
-  max-width: 450px;
-  display: flex;
-  flex-direction: column;
-  color: #2A2B2A;
-  background-color: #F4BFDB;
-  padding: 1rem;
-  border-left: solid 4px #2A2B2A;
-  text-align: center;
-}
-
-.projects-title {
+.error-message {
   position: relative;
-  margin-top: 10px;
+  margin-top: 6px;
+  left: 0;
+  top: 100%;
+  background-color: white;
+  color: black;
+  font-size: 14px;
+  border-radius: 10px;
+  padding: 6px 10px;
+  z-index: 1000;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.projects-title::after {
+.error-message::before {
   content: "";
   position: absolute;
-  bottom: -32px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  height: 6px;
-  background-color: #2A2B2A;
-  border-radius: 20px;
-}*/
+  top: 0px;
+  left: 12px;
+  transform: translateY(-100%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent white transparent;
+}
+

@@ -45,12 +45,12 @@
             <form action="" method="get" id="new-project-form">
                 <fieldset class="remove-border-background">
                     <div class="form-row">
-                        <label for="title">Title</label>
-                        <input id="new-project-title" type="text" name="title" placeholder="Cutting starts now!">
+                        <label for="new-project-title">Title</label>
+                        <input id="new-project-title" type="text" name="title" maxlength="39" placeholder="Cutting starts now!">
                     </div>
                     <div class="form-row">
-                        <label for="description">Description</label>
-                        <textarea id="new-project-desc" name="description" rows="3" autocorrect="on" placeholder="I want to reach a body fat percentage of 15% by August 1st"></textarea>
+                        <label for="new-project-desc">Description</label>
+                        <textarea id="new-project-desc" name="description" rows="3" autocorrect="on" maxlength="120" placeholder="I want to reach a body fat percentage of 15% by August 1st"></textarea>
                     </div>
                 </fieldset>
                 <div class="new-project-form-buttons bold">
@@ -64,8 +64,8 @@
             <form action="" method="get" id="new-list-form">
                 <fieldset class="remove-border-background">
                     <div class="form-row">
-                        <label for="description">Title</label>
-                        <input id="new-list-title" type="text" name="title" placeholder="Pack bags">
+                        <label for="new-list-title">Title</label>
+                        <input id="new-list-title" type="text" name="title" maxlength="36" placeholder="Pack bags">
                     </div>
                 </fieldset>
                 <div class="new-list-form-buttons bold">
@@ -79,16 +79,23 @@
             <form action="" method="get" id="new-todo-form">
                 <fieldset class="remove-border-background">
                     <div class="form-row">
-                        <label for="description">Title</label>
-                        <input id="new-todo-desc" type="text" name="description" placeholder="Cutting starts now!">
+                        <label for="new-todo-desc">Title</label>
+                        <input id="new-todo-desc" type="text" name="description" maxlength="36" placeholder="Cutting starts now!">
                     </div>
                     <div class="form-row">
-                        <label for="date">Due date</label>
+                        <label for="new-todo-date">Due date</label>
                         <input id="new-todo-date" type="date" name="date">
                     </div>
                     <div class="form-row">
-                        <label for="priority">Priority</label>
-                        <input id="new-todo-priority" type="number" name="priority">
+                        <label for="new-todo-priority">Priority</label>
+                        <select id="new-todo-priority" name="priority">
+                            <option selected="selected">-</option>
+                            <option value=1>1</option>
+                            <option value=2>2</option>
+                            <option value=3>3</option>
+                            <option value=4>4</option>
+                            <option value=5>5</option>
+                        </select>
                     </div>
                 </fieldset>
                 <div class="new-todo-form-buttons bold">

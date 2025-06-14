@@ -2,6 +2,7 @@ import { appController } from "./app-controller";
 import { svg } from "./svg";
 import { format } from "date-fns";
 import { VirtualList } from "./virtual-list";
+import { formValidator } from "./form-validator";
 
 class UIController {
     constructor() {
@@ -88,9 +89,9 @@ class UIController {
 
         const description = document.createElement("div");
         description.classList.add("nav-project-desc");
-        project.description.length <= 70 ?
+        project.description.length <= 35 ?
             description.innerHTML = project.description :
-            description.innerHTML = project.description.slice(0, 70) + "...";
+            description.innerHTML = project.description.slice(0, 35).trim() + "...";
 
         projectContainer.addEventListener("click", () => {
             appController.switchPage(project);
@@ -160,7 +161,7 @@ class UIController {
             const textarea = document.createElement("textarea");
             textarea.value = project.description;
             textarea.classList.add("edit-input");
-            textarea.classList.add("desc-edit-input");
+            textarea.id = "desc-edit-input";
             textarea.style.margin = 0;
             textarea.style.padding = getComputedStyle(description).padding;
 
@@ -169,6 +170,7 @@ class UIController {
             descriptionClone.style.visibility = "hidden";
             descriptionClone.style.position = "absolute";
             descriptionClone.style.whiteSpace = "pre-wrap";
+            descriptionClone.className = description.className;
             descriptionClone.style.fontSize = getComputedStyle(description).fontSize;
             descriptionClone.style.fontFamily = getComputedStyle(description).fontFamily;
             descriptionClone.style.lineHeight = getComputedStyle(description).lineHeight;
@@ -186,6 +188,7 @@ class UIController {
             textarea.focus();
 
             const commitEdit = () => {
+                debugger;
                 project.changeDescription(textarea.value);
                 this.rerenderPage();
             };
@@ -223,7 +226,7 @@ class UIController {
 
         if (this.content.children.length === 2) {
             const message = document.createElement("div");
-            message.classList.add("empty");
+            message.classList.add("no-lists");
             message.textContent = "No lists found. Start by creating a list and adding some todos";
             this.content.appendChild(message);
         }
@@ -277,6 +280,13 @@ class UIController {
                 list.project.deleteList(list.id);
                 rerenderFn();
             })
+
+            if (list.todos.length === 0) {
+                const message = document.createElement("div");
+                message.classList.add("no-todos");
+                message.textContent = "No todos found.";
+                section.appendChild(message);
+            }
 
             heading.addEventListener("dblclick", () => {
                 const input = document.createElement("input");
@@ -400,7 +410,7 @@ class UIController {
             });
 
             container.appendChild(label);
-
+            
             const date = document.createElement("div");
             date.classList.add("todo-date");
             const formattedDate = format(todo.dueDate, "dd MMM yyyy");
@@ -438,8 +448,6 @@ class UIController {
             priority.addEventListener("dblclick", () => {
                 const input = document.createElement("input");
                 input.type = "number";
-                input.min = 1;
-                input.max = 5;
                 input.value = todo.priority;
                 input.classList.add("edit-input");
                 input.classList.add("todo-edit-priority-input");
@@ -504,6 +512,10 @@ class UIController {
         return section;
     };
 
+    
+
+    
+
     highlightActiveProject(newProject, oldProject) {
         if (oldProject) {
             document.querySelector(`#${CSS.escape(oldProject.id)}`)?.classList.remove("active-project");
@@ -555,6 +567,56 @@ class UIController {
         } 
     }
 
+    validateForm(type) {
+        switch (type) {
+            case "project":
+                return formValidator.validateProjectForm(
+                    this.newProjectTitle,
+                    this.newProjectDesc
+                );
+            case "list":
+                return formValidator.validateListForm(
+                    this.newListTitle
+                );
+            case "todo":
+                return formValidator.validateTodoForm(
+                    this.newTodoDesc,
+                    this.newTodoDate,
+                    this.newTodoPriority
+                );
+        }
+    }
+
+    addErrorMessage(input, reason) {
+        const formRow = input.parentNode;
+        const errorMessage = document.createElement("div");
+        errorMessage.classList.add("error-message");
+
+        const messages = {
+            "new-project-title_empty": "*Please enter a title.",
+            "new-project-title_too_long": "*Title is too long.",
+            "new-project-desc_empty": "*Please enter a description.",
+            "new-project-desc_too_long": "*Description is too long.",
+            "new-list-title_empty": "*Please enter a title.",
+            "new-list-title_too_long": "*Title is too long.",
+            "new-todo-desc_empty": "*Please enter a description.",
+            "new-todo-desc_too_long": "*Description is too long.",
+            "new-todo-date_empty": "*Please select a date.",
+            "new-todo-date_invalid": "*Due date must be today or later.",
+            "new-todo-priority_empty": "*Please enter a priority.",
+            "new-todo-priority_invalid": "*Priority must be between 1 and 5."
+        };
+
+        errorMessage.textContent = messages[`${input.id}_${reason}`] || "Invalid input.";
+        formRow.appendChild(errorMessage);
+    }
+
+    clearErrorMessages() {
+        this.newProjectForm.querySelectorAll(".error-message").forEach(message => message.remove());
+        this.newListForm.querySelectorAll(".error-message").forEach(message => message.remove());
+        this.newTodoForm.querySelectorAll(".error-message").forEach(message => message.remove());
+    }
+
     setUpEventListeners() { 
         this.newProject.addEventListener("click", (e) => {
             this.openDialog("project");
@@ -562,53 +624,81 @@ class UIController {
 
         this.createProjectButton.addEventListener("click", (e) => {
             e.preventDefault();
-            const title = this.newProjectTitle.value;
-            const description = this.newProjectDesc.value;
-            appController.createProject(title, description);
-            this.clearForm("project");
+            this.clearErrorMessages();
+            const validation = this.validateForm("project")
+            if (validation.isValid) {
+                const title = this.newProjectTitle.value;
+                const description = this.newProjectDesc.value;
+                appController.createProject(title, description);
+                this.clearForm("project");
+            } else {
+                validation.invalidInputs.forEach(({ input, reason }) => {
+                    this.addErrorMessage(input, reason);
+                });
+            }            
         })
 
         this.createListButton.addEventListener("click", (e) => {
             e.preventDefault();
-            const title = this.newListTitle.value;
-            const project = appController.getActiveProject();
-            project.createList(title, project);
-            this.clearForm("list");
-            this.closeDialog("list");
-            this.rerenderPage();
+            this.clearErrorMessages();
+            const validation = this.validateForm("list");
+            if (validation.isValid) {
+                const title = this.newListTitle.value;
+                const project = appController.getActiveProject();
+                project.createList(title, project);
+                this.clearForm("list");
+                this.closeDialog("list");
+                this.rerenderPage();
+            } else {
+                validation.invalidInputs.forEach(({ input, reason }) => {
+                    this.addErrorMessage(input, reason);
+                });
+            }    
         })        
 
         this.createTodoButton.addEventListener("click", (e) => {
             e.preventDefault();
-            const description = this.newTodoDesc.value;
-            const date = this.newTodoDate.valueAsDate;
-            const priority = parseInt(this.newTodoPriority.value);
-
-            this.activeList.createTodo(description, date, priority);
-            this.clearForm("todo");
-            this.closeDialog("todo");
-            this.rerenderPage();
+            this.clearErrorMessages();
+            const validation = this.validateForm("todo");
+            if (validation.isValid) {
+                const description = this.newTodoDesc.value;
+                const date = this.newTodoDate.valueAsDate;
+                const priority = parseInt(this.newTodoPriority.value);
+                this.activeList.createTodo(description, date, priority);
+                
+                this.clearForm("todo");
+                this.closeDialog("todo");
+                this.rerenderPage();
+            } else {
+                validation.invalidInputs.forEach(({ input, reason }) => {
+                    this.addErrorMessage(input, reason);
+                });
+            }            
         });
 
         this.closeProjectButton.addEventListener("click", (e) => {
             e.preventDefault();
+            this.clearErrorMessages();
             this.closeDialog("project");
             this.clearForm("project");
         })
 
         this.closeListButton.addEventListener("click", (e) => {
             e.preventDefault();
+            this.clearErrorMessages();
             this.closeDialog("list");
             this.clearForm("list");
         })
 
         this.closeTodoButton.addEventListener("click", (e) => {
             e.preventDefault();
+            this.clearErrorMessages();
             this.closeDialog("todo");
             this.clearForm("todo");
         })
 
         this.homeButton.addEventListener("click", () => {
+            this.clearErrorMessages();
             appController.switchPage();
         })
     }
