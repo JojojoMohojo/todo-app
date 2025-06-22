@@ -102,6 +102,7 @@ textarea {
 
 * {
   box-sizing: border-box;
+  /* border: solid red 0.1px; */
 }
 
 
@@ -156,16 +157,22 @@ nav {
   width: auto;
 }
 
-.logo-wrapper::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
+.divider {
   height: 4px;
   background-color: var(--black);
+}
+
+.nav-divider {
+  width: 90%;
+  align-self: center;
   border-radius: 20px;
+}
+
+.main-divider {
+  width: 101%;
+  border-radius: 20px;
+  margin-left: -1%;
+  margin-bottom: 14px;
 }
 
 .links {
@@ -203,30 +210,17 @@ nav {
 
 .nav-new-project {
   position: relative;
-  margin-bottom: 4px;
-}
-
-.nav-new-project::after {
-  content: "";
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  height: 4px;
-  background-color: var(--black);
-  border-radius: 20px;
 }
 
 .project-container {
   display: grid;
-  height: 68px;
+  height: 66px;
   grid-template-columns: 1.8rem auto auto;
   grid-template-rows: 1.8rem auto auto;
   column-gap: 10px;
   row-gap: 2px;
   align-items: center;
-  padding: 0.5rem 0 0.1rem 1rem;
+  padding: 0.4rem 0 0.1rem 1rem;
 }
 
 .active-project {
@@ -265,6 +259,10 @@ nav {
   background-color: var(--blue);
 }
 
+.nav-project-icon {
+  margin-top: 2px;
+}
+
 .nav-project-desc {
   grid-column-start: span 2;
   font-size: 1rem;
@@ -296,6 +294,10 @@ nav {
   min-width: 700px;
 }
 
+.header-container {
+  display: flex;
+}
+
 .header {
   display: flex;
   height: 125px;
@@ -305,11 +307,6 @@ nav {
   background-color: var(--white);
   z-index: 100;
   padding: 0 0 0 30px;
-  margin-bottom: 20px;
-}
-
-.header-container {
-  display: flex;
 }
 
 .title-icon {
@@ -321,33 +318,40 @@ nav {
   color: var(--black);
 }
 
-.header::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 95%;
-  height: 4px;
-  background-color: var(--black);
-  border-radius: 20px;
-}
-
 .content {
   overflow-y: auto;
   flex-grow: 1;
-  padding: 0px 0px 50px 50px;
+  padding: 0px 3% 3% 3%;
+}
+
+.project-info {
+  box-sizing: border-box;
+  height: 118px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 200px 10px 0px;
+}
+
+.desc-container {
+  justify-self: start;
+  align-self: start;
+  width: 650px;
 }
 
 .project-description {
+  box-sizing: border-box;
   font-size: 1.4rem;
-  width: 50%;
   color: var(--grey);
+  height: 100px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .edit-input {
   font-family: inherit;
   font-size: 1rem;
+  box-sizing: border-box;
   color: var(--black);
   background-color: var(--white);
   border: 2px solid var(--grey);
@@ -357,25 +361,27 @@ nav {
   min-width: 0;
 }
 
-textarea#desc-edit-input {
+#desc-edit-input {
+  max-width: 100%;
+  max-height: 100px;
+  width: 100%;
+  height: 100px;
   margin: 0;
-  padding: 0 6px;
+  padding: 4px 6px;
   font-size: 1.4rem;
   line-height: 1.4;
-  vertical-align: top;
-  align-self: flex-start;
   box-sizing: border-box;
-}
-
-#desc-edit-input {
-  max-width: 50%;
-  font-size: 1.4rem;
-  margin-bottom: 0px;
-  padding: 4px 6px;
-  margin: 0 0 50px 0;
+  overflow: hidden;
+  resize: none;
+  border: none;
+  outline: none;
 }
 
 .new-list-container {
+  align-self: center;
+}
+
+.new-list-button {
   display: flex;
   gap: 20px;
   width: 200px;
@@ -387,11 +393,15 @@ textarea#desc-edit-input {
   margin: 20px 0 20px 0;
 }
 
-.new-list-container:hover {
+.new-list-button:hover {
   background-color: var(--darker-aquamarine);
 }
 
-.new-list-button,
+.new-list-icon {
+  margin-top: 3px;
+}
+
+.new-list-icon,
 .delete-list-button {
   display: flex;
   height: 1.8rem;
@@ -454,16 +464,23 @@ svg {
   box-sizing: border-box;
   width: auto;
   font-size: 1.4rem;
+  max-width: 450px;
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
 .list-edit-input {
+  font-family: inherit;
   font-size: 2rem;
-  width: auto;
-  max-width: 100%;
-  padding: 0px 8px;
+  padding: 4px 6px;
+  box-sizing: border-box;
+  max-width: 450px;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: var(--white);
+  color: var(--black);
 }
 
 .todo-date,
@@ -509,10 +526,16 @@ svg {
 
 .todo-edit-label-input {
   font-size: 1.3rem;
+  font-family: inherit;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  background: var(--white);
+  color: var(--black);
   width: auto;
-  max-width: 100%;
   min-width: 50px;
-  padding: 1px 10px;
+  max-width: 100%;
 }
 
 .edit-input:focus {

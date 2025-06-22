@@ -56,6 +56,7 @@ class UIController {
                 this.createProjectElement(project)
             }
         });
+        this.highlightActiveProject(appController.getActiveProject());
     }
 
     createProjectElement(project) {
@@ -84,7 +85,6 @@ class UIController {
 
         deleteIcon.addEventListener("click", () => {
             appController.deleteProject(project.id);
-            console.log("click");
         });
 
         const description = document.createElement("div");
@@ -151,52 +151,45 @@ class UIController {
         this.pageTitle.textContent = project.title;
         this.titleIcon.innerHTML = svg.getSvgIcons().projectIcon;
         this.clearContent();
+        
+        const divider = document.createElement("div");
+        divider.classList.add("divider", "main-divider");
+        this.content.appendChild(divider);
+
+        const projectInfo = document.createElement("div");
+        projectInfo.classList.add("project-info");
+        this.content.appendChild(projectInfo);
+
+        const descriptionContainer = document.createElement("div");
+        descriptionContainer.classList.add("desc-container");
+        projectInfo.appendChild(descriptionContainer);
 
         const description = document.createElement("div");
         description.classList.add("project-description");
         description.textContent = project.description;
-        this.content.appendChild(description);
+        descriptionContainer.appendChild(description);
 
-        description.addEventListener("dblclick", () => {
+        descriptionContainer.addEventListener("dblclick", () => {
             const textarea = document.createElement("textarea");
             textarea.value = project.description;
             textarea.classList.add("edit-input");
             textarea.id = "desc-edit-input";
-            textarea.style.margin = 0;
-            textarea.style.padding = getComputedStyle(description).padding;
-
-            // Clone to measure initial size
-            const descriptionClone = description.cloneNode(true);
-            descriptionClone.style.visibility = "hidden";
-            descriptionClone.style.position = "absolute";
-            descriptionClone.style.whiteSpace = "pre-wrap";
-            descriptionClone.className = description.className;
-            descriptionClone.style.fontSize = getComputedStyle(description).fontSize;
-            descriptionClone.style.fontFamily = getComputedStyle(description).fontFamily;
-            descriptionClone.style.lineHeight = getComputedStyle(description).lineHeight;
-            descriptionClone.style.width = getComputedStyle(description).width;
-            descriptionClone.style.padding = getComputedStyle(description).padding;
-            descriptionClone.textContent = project.description;
-            document.body.appendChild(descriptionClone);
-
-            textarea.style.width = `${descriptionClone.offsetWidth}px`;
-            textarea.style.height = `${descriptionClone.offsetHeight + 5}px`;
-
-            document.body.removeChild(descriptionClone);
+            textarea.style.overflow = "hidden";
+            textarea.style.resize = "none";
 
             description.replaceWith(textarea);
             textarea.focus();
 
             const commitEdit = () => {
-                debugger;
                 project.changeDescription(textarea.value);
                 this.rerenderPage();
+                this.renderProjectsList();
             };
 
             textarea.addEventListener("blur", commitEdit);
             textarea.addEventListener("keydown", (e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault(); // prevent line break
+                    e.preventDefault();
                     textarea.blur();
                 }
             });
@@ -204,20 +197,25 @@ class UIController {
 
         const newListContainer = document.createElement("div");
         newListContainer.classList.add("new-list-container");
-        newListContainer.classList.add("pointer");
-        newListContainer.classList.add("bold");
-        newListContainer.textContent = "New list";
+        projectInfo.appendChild(newListContainer);
 
-        const newList = document.createElement("div");
-        newList.classList.add("new-list-button");
-        newList.innerHTML = svg.getSvgIcons().addListIcon;
+        const newListButton = document.createElement("div");
+        newListButton.classList.add("new-list-button", "pointer", "bold");
+        newListButton.textContent = "New List";
 
-        newListContainer.appendChild(newList);
-        this.content.appendChild(newListContainer);
+        const newListIcon = document.createElement("div");
+        newListIcon.classList.add("new-list-icon");
+        newListIcon.innerHTML = svg.getSvgIcons().addListIcon;
 
-        newListContainer.addEventListener("click", () => {
+        newListButton.appendChild(newListIcon);
+        newListContainer.appendChild(newListButton);
+
+        newListButton.addEventListener("click", () => {
             this.openDialog("list");
         });
+        
+        const dividerClone = divider.cloneNode(true);
+        this.content.appendChild(dividerClone);
 
         project.lists.forEach(list => {
             list.todos.sort((a, b) => a.priority - b.priority);
@@ -292,48 +290,19 @@ class UIController {
                 const input = document.createElement("input");
                 input.type = "text";
                 input.value = list.title;
-                input.classList.add("edit-input");
-                input.classList.add("list-edit-input");
-
-                // Clone to measure original width
-                const headingClone = heading.cloneNode(true);
-                headingClone.style.visibility = "hidden";
-                headingClone.style.position = "absolute";
-                headingClone.style.whiteSpace = "pre";
-                headingClone.style.fontSize = getComputedStyle(heading).fontSize;
-                headingClone.style.fontFamily = getComputedStyle(heading).fontFamily;
-                document.body.appendChild(headingClone);
-
-                const headingWidth = headingClone.offsetWidth;
-                input.style.width = `${headingWidth + 25}px`;
-                document.body.removeChild(headingClone);
-
-                // Live resizing mirror
-                const mirror = document.createElement("span");
-                mirror.style.position = "absolute";
-                mirror.style.visibility = "hidden";
-                mirror.style.whiteSpace = "pre";
-                mirror.style.fontSize = getComputedStyle(heading).fontSize;
-                mirror.style.fontFamily = getComputedStyle(heading).fontFamily;
-                document.body.appendChild(mirror);
-
-                input.addEventListener("input", () => {
-                    mirror.textContent = input.value || " ";
-                    input.style.width = `${mirror.offsetWidth + 10}px`;
-                });
+                input.classList.add("edit-input", "list-edit-input");
 
                 heading.replaceWith(input);
                 input.focus();
 
                 const commitEdit = () => {
-                    list.changeTitle(input.value);
+                    list.changeTitle(input.value);                    
                     this.rerenderPage();
-                    document.body.removeChild(mirror);
                 };
 
                 input.addEventListener("blur", commitEdit);
                 input.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") input.blur();
+                    if (e.key === "Enter") e.preventDefault(), input.blur();
                 });
             });
         }
@@ -359,54 +328,35 @@ class UIController {
             label.textContent = todo.description;
 
             label.addEventListener("dblclick", () => {
-                const input = document.createElement("input");
-                input.type = "text";
-                input.value = todo.description;
-                input.classList.add("edit-input");
-                input.classList.add("todo-edit-label-input");
+                const label = document.createElement("label");
+                label.textContent = todo.description;
 
-                // Clone label to measure width
-                const labelClone = label.cloneNode(true);
-                labelClone.style.visibility = "hidden";
-                labelClone.style.position = "absolute";
-                labelClone.style.whiteSpace = "pre";
-                labelClone.style.fontSize = getComputedStyle(label).fontSize;
-                labelClone.style.fontFamily = getComputedStyle(label).fontFamily;
-                document.body.appendChild(labelClone);
+                label.addEventListener("dblclick", () => {
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.value = todo.description;
+                    input.classList.add("edit-input", "todo-edit-label-input");
 
-                // Match initial input width to label's width
-                const labelWidth = labelClone.offsetWidth;
-                input.style.width = `${labelWidth + 10}px`;
-                document.body.removeChild(labelClone);
+                    input.style.width = `${label.scrollWidth}px`;
 
-                // Add listener to auto-resize as user types
-                input.addEventListener("input", () => {
-                    mirror.textContent = input.value || " ";
-                    input.style.width = `${mirror.offsetWidth + 10}px`;
-                });
+                    input.addEventListener("input", () => {
+                        input.style.width = "1px";
+                        input.style.width = `${input.scrollWidth + 2}px`;
+                    });
 
-                // Create hidden mirror span for live resizing
-                const mirror = document.createElement("span");
-                mirror.style.position = "absolute";
-                mirror.style.visibility = "hidden";
-                mirror.style.whiteSpace = "pre";
-                mirror.style.fontSize = getComputedStyle(label).fontSize;
-                mirror.style.fontFamily = getComputedStyle(label).fontFamily;
-                document.body.appendChild(mirror);
+                    label.replaceWith(input);
+                    input.focus();
 
-                label.replaceWith(input);
-                input.focus();
+                    const commitEdit = () => {
+                        todo.changeDescription(input.value);
+                        this.rerenderPage();
+                    };
 
-                const commitEdit = () => {
-                    todo.changeDescription(input.value);
-                    this.rerenderPage();
-                    document.body.removeChild(mirror);
-                };
-
-                input.addEventListener("blur", commitEdit);
-                input.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") input.blur();
-                });
+                    input.addEventListener("blur", commitEdit);
+                    input.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter") input.blur();
+                    });
+                });  
             });
 
             container.appendChild(label);
@@ -511,9 +461,6 @@ class UIController {
         section.appendChild(ul);
         return section;
     };
-
-    
-
     
 
     highlightActiveProject(newProject, oldProject) {
