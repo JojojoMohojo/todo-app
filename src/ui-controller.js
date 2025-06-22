@@ -2,7 +2,7 @@ import { appController } from "./app-controller";
 import { svg } from "./svg";
 import { format } from "date-fns";
 import { VirtualList } from "./virtual-list";
-import { formValidator } from "./form-validator";
+import { validator } from "./validator";
 
 class UIController {
     constructor() {
@@ -89,9 +89,9 @@ class UIController {
 
         const description = document.createElement("div");
         description.classList.add("nav-project-desc");
-        project.description.length <= 35 ?
+        project.description.length <= 23 ?
             description.innerHTML = project.description :
-            description.innerHTML = project.description.slice(0, 35).trim() + "...";
+            description.innerHTML = project.description.slice(0, 23).trim() + "...";
 
         projectContainer.addEventListener("click", () => {
             appController.switchPage(project);
@@ -109,6 +109,10 @@ class UIController {
         this.pageTitle.textContent= "Home";
         this.titleIcon.innerHTML = svg.getSvgIcons().homeIcon;
         this.clearContent();
+
+        const divider = document.createElement("div");
+        divider.classList.add("divider", "main-divider");
+        this.content.appendChild(divider);
 
         const projects = appController.getProjects();
         const todayDate = new Date();
@@ -292,8 +296,16 @@ class UIController {
                 input.value = list.title;
                 input.classList.add("edit-input", "list-edit-input");
 
+                const rect = heading.getBoundingClientRect();
+                input.style.width = `${rect.width + 30}px`;
+
                 heading.replaceWith(input);
                 input.focus();
+
+                input.addEventListener("input", () => {
+                    input.style.width = "1px";
+                    input.style.width = `${input.scrollWidth + 1}px`;
+                });
 
                 const commitEdit = () => {
                     list.changeTitle(input.value);                    
@@ -323,43 +335,41 @@ class UIController {
             checkbox.checked = todo.completed;
             container.appendChild(checkbox);
 
-            const label = document.createElement("label");
-            label.setAttribute("for", checkbox.id);
-            label.textContent = todo.description;
+            const description = document.createElement("div");
+            description.classList.add("todo-description");
+            description.textContent = todo.description;
 
-            label.addEventListener("dblclick", () => {
-                const label = document.createElement("label");
-                label.textContent = todo.description;
+            description.addEventListener("dblclick", () => {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.value = todo.description;
+                input.classList.add("edit-input", "todo-edit-description-input");
 
-                label.addEventListener("dblclick", () => {
-                    const input = document.createElement("input");
-                    input.type = "text";
-                    input.value = todo.description;
-                    input.classList.add("edit-input", "todo-edit-label-input");
+                const rect = description.getBoundingClientRect();
+                input.style.width = `${rect.width + 30}px`;
 
-                    input.style.width = `${label.scrollWidth}px`;
+                input.addEventListener("input", () => {
+                    input.style.width = "1px";
+                    input.style.width = `${input.scrollWidth + 1}px`;
+                });
 
-                    input.addEventListener("input", () => {
-                        input.style.width = "1px";
-                        input.style.width = `${input.scrollWidth + 2}px`;
-                    });
+                description.replaceWith(input);
+                input.focus();
 
-                    label.replaceWith(input);
-                    input.focus();
+                const commitEdit = () => {
+                    debugger;
+                    todo.changeDescription(input.value);
+                    this.rerenderPage();
+                };
 
-                    const commitEdit = () => {
-                        todo.changeDescription(input.value);
-                        this.rerenderPage();
-                    };
-
-                    input.addEventListener("blur", commitEdit);
-                    input.addEventListener("keydown", (e) => {
-                        if (e.key === "Enter") input.blur();
-                    });
-                });  
+                input.addEventListener("blur", commitEdit);
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") input.blur();
+                });
             });
 
-            container.appendChild(label);
+
+            container.appendChild(description);
             
             const date = document.createElement("div");
             date.classList.add("todo-date");
@@ -396,36 +406,41 @@ class UIController {
             priority.textContent = todo.priority;
 
             priority.addEventListener("dblclick", () => {
-                const input = document.createElement("input");
-                input.type = "number";
-                input.value = todo.priority;
-                input.classList.add("edit-input");
-                input.classList.add("todo-edit-priority-input");
+                const select = document.createElement("select");
+                select.classList.add("edit-input", "todo-edit-priority-input");
 
-                priority.replaceWith(input);
-                input.focus();
+                for (let i = 1; i <= 5; i++) {
+                    const option = document.createElement("option");
+                    option.value = i;
+                    option.textContent = i;
+                    if (i === todo.priority) option.selected = true;
+                    select.appendChild(option);
+                }
+
+                priority.replaceWith(select);
+                select.focus();
 
                 const commitEdit = () => {
-                    const newPriority = parseInt(input.value);
+                    const newPriority = parseInt(select.value);
                     if (!isNaN(newPriority)) {
                         todo.changePriority(newPriority);
                     }
                     this.rerenderPage();
                 };
 
-                input.addEventListener("blur", commitEdit);
-                input.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") input.blur();
+                select.addEventListener("blur", commitEdit);
+                select.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") select.blur();
                 });
             });
             container.appendChild(priority);
 
             if (todo.completed) {
-                label.classList.add("completed-todo-text");
+                description.classList.add("completed-todo-text");
                 date.classList.add("completed-todo-details");
                 priority.classList.add("completed-todo-details");
             } else {
-                label.classList.remove("completed-todo-text");
+                description.classList.remove("completed-todo-text");
                 date.classList.remove("completed-todo-details");
                 priority.classList.remove("completed-todo-details");
             }
@@ -433,11 +448,11 @@ class UIController {
             checkbox.addEventListener("click", () => {
                 todo.changeCompletedStatus();
                 if (todo.completed) {
-                    label.classList.add("completed-todo-text");
+                    description.classList.add("completed-todo-text");
                     date.classList.add("completed-todo-details");
                     priority.classList.add("completed-todo-details");
                 } else {
-                    label.classList.remove("completed-todo-text");
+                    description.classList.remove("completed-todo-text");
                     date.classList.remove("completed-todo-details");
                     priority.classList.remove("completed-todo-details");
                 }
@@ -517,16 +532,16 @@ class UIController {
     validateForm(type) {
         switch (type) {
             case "project":
-                return formValidator.validateProjectForm(
+                return validator.validateProjectForm(
                     this.newProjectTitle,
                     this.newProjectDesc
                 );
             case "list":
-                return formValidator.validateListForm(
+                return validator.validateListForm(
                     this.newListTitle
                 );
             case "todo":
-                return formValidator.validateTodoForm(
+                return validator.validateTodoForm(
                     this.newTodoDesc,
                     this.newTodoDate,
                     this.newTodoPriority

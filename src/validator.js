@@ -1,6 +1,4 @@
-import { List } from "./list";
-
-class FormValidator {
+class Validator {
     constructor() {
 
     }
@@ -15,7 +13,7 @@ class FormValidator {
         if (title === "") {
             isValid = false;
             invalidInputs.push({ input: titleInput, reason: "empty" });
-        } else if (title.length > 39) {
+        } else if (title.length > 14) {
             isValid = false;
             invalidInputs.push({ input: titleInput, reason: "too_long" });
         }
@@ -90,4 +88,4 @@ class FormValidator {
     }
 }
 
-export const formValidator = new FormValidator();
+export const validator = new Validator();
