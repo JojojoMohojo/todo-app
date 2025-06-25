@@ -217,12 +217,26 @@ nav {
 .project-container {
   display: grid;
   height: 66px;
-  grid-template-columns: 1.8rem auto auto;
-  grid-template-rows: 1.8rem auto auto;
-  column-gap: 10px;
-  row-gap: 2px;
+  grid-template-columns: 1.8rem auto 1.8rem;
+  grid-template-rows: 1.8rem auto 1.8rem;
+  column-gap: 8px;
   align-items: center;
   padding: 0.4rem 0 0.1rem 1rem;
+}
+
+.nav-project-name,
+.nav-project-desc {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 600px;
+}
+
+.nav-project-desc {
+  grid-column-start: span 3;
+  grid-row-start: span 2;
+  font-size: 1rem;
+  max-width: 320px;
 }
 
 .active-project {
@@ -263,11 +277,6 @@ nav {
 
 .nav-project-icon {
   margin-top: 2px;
-}
-
-.nav-project-desc {
-  grid-column-start: span 2;
-  font-size: 1rem;
 }
 
 .sidebar-icons {
@@ -471,10 +480,23 @@ svg {
   box-sizing: border-box;
   height: 34px;
   width: auto;
-  max-width: 600px;
+  max-width: 700px;
   display: flex;
   align-items: center;
   gap: 15px;
+}
+
+.project-edit-input {
+  font-family: inherit;
+  font-size: 3.5rem;
+  padding: 4px 6px;
+  box-sizing: border-box;
+  max-height: 84px;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: var(--white);
+  color: var(--black);
 }
 
 .list-edit-input {
@@ -525,8 +547,6 @@ svg {
 .todo-date {
   background-color: var(--thistle);
 }
-
-
 
 .todo-priority {
   background-color: var(--fairy-tale);

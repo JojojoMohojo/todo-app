@@ -8,7 +8,8 @@ class UIController {
     constructor() {
         this.content = document.querySelector(".content");
         this.titleIcon = document.querySelector(".title-icon");
-        this.pageTitle = document.querySelector(".page-title")
+        this.pageTitle = document.querySelector(".page-title");
+        this.pageTitleEditHandler = null;
 
         //Side bar
         this.homeButton = document.querySelector(".nav-home");
@@ -83,15 +84,14 @@ class UIController {
         deleteIcon.classList.add("nav-icon");
         deleteIcon.innerHTML = svg.getSvgIcons().trashIcon;
 
-        deleteIcon.addEventListener("click", () => {
-            appController.deleteProject(project.id);
+        deleteIcon.addEventListener("click", (e) => {
+            e.stopPropagation();
+            appController.deleteProject(project);
         });
 
         const description = document.createElement("div");
         description.classList.add("nav-project-desc");
-        project.description.length <= 23 ?
-            description.innerHTML = project.description :
-            description.innerHTML = project.description.slice(0, 23).trim() + "...";
+        description.innerHTML = project.description;
 
         projectContainer.addEventListener("click", () => {
             appController.switchPage(project);
@@ -106,8 +106,24 @@ class UIController {
     }
 
     renderHomePage() {
+        console.log("rendered home page");
+        const titleWrapper = document.querySelector(".page-title-wrapper");
+        titleWrapper.innerHTML = "";
+
+        this.pageTitle = document.createElement("div");
+        this.pageTitle.classList.add("page-title");
+        this.pageTitle.textContent = "Home";
+
+        titleWrapper.appendChild(this.pageTitle);
+
         this.pageTitle.textContent= "Home";
         this.titleIcon.innerHTML = svg.getSvgIcons().homeIcon;
+
+        if (this.pageTitleEditHandler) {
+            this.pageTitle.removeEventListener("dblclick", this.pageTitleEditHandler);
+            this.pageTitleEditHandler = null;
+        }
+
         this.clearContent();
 
         const divider = document.createElement("div");
@@ -152,8 +168,53 @@ class UIController {
     
     renderProjectPage() {
         const project = appController.getActiveProject();
+        const titleWrapper = document.querySelector(".page-title-wrapper");
+        titleWrapper.innerHTML = ""; // clear previous content
+
+        this.pageTitle = document.createElement("div");
+        this.pageTitle.classList.add("page-title");
+        this.pageTitle.textContent = project.title;
+
+        titleWrapper.appendChild(this.pageTitle);
+
         this.pageTitle.textContent = project.title;
         this.titleIcon.innerHTML = svg.getSvgIcons().projectIcon;
+
+        if (this.pageTitleEditHandler) {
+            this.pageTitle.removeEventListener("dblclick", this.pageTitleEditHandler);
+        }
+
+        this.pageTitleEditHandler = () => {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = this.pageTitle.textContent;
+            input.classList.add("edit-input", "project-edit-input");
+            input.setAttribute("maxlength", "21");
+
+            const rect = this.pageTitle.getBoundingClientRect();
+            input.style.width = `${rect.width + 30}px`;
+
+            this.pageTitle.replaceWith(input);
+            input.focus();
+
+            input.addEventListener("input", () => {
+                input.style.width = "1px";
+                input.style.width = `${input.scrollWidth + 1}px`;
+            });
+
+            const commitEdit = () => {
+                appController.getActiveProject().changeTitle(input.value);
+                this.renderProjectsList();                    
+                this.rerenderPage();
+            };
+
+            input.addEventListener("blur", commitEdit);
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") e.preventDefault(), input.blur();
+            });
+        };
+
+        this.pageTitle.addEventListener("dblclick", this.pageTitleEditHandler);
         this.clearContent();
         
         const divider = document.createElement("div");
@@ -180,6 +241,7 @@ class UIController {
             textarea.id = "desc-edit-input";
             textarea.style.overflow = "hidden";
             textarea.style.resize = "none";
+            textarea.setAttribute("maxlength", "120");
 
             description.replaceWith(textarea);
             textarea.focus();
@@ -279,7 +341,7 @@ class UIController {
             headingContainer.appendChild(deleteListButton);
 
             deleteListButton.addEventListener("click", () => {
-                list.project.deleteList(list.id);
+                list.project.deleteList(list);
                 rerenderFn();
             })
 
@@ -295,6 +357,7 @@ class UIController {
                 input.type = "text";
                 input.value = list.title;
                 input.classList.add("edit-input", "list-edit-input");
+                input.setAttribute("maxlength", "36");
 
                 const rect = heading.getBoundingClientRect();
                 input.style.width = `${rect.width + 30}px`;
@@ -344,6 +407,7 @@ class UIController {
                 input.type = "text";
                 input.value = todo.description;
                 input.classList.add("edit-input", "todo-edit-description-input");
+                input.setAttribute("maxlength", "36");
 
                 const rect = description.getBoundingClientRect();
                 input.style.width = `${rect.width + 30}px`;
@@ -465,7 +529,7 @@ class UIController {
             container.appendChild(deleteTodoButton);
 
             deleteTodoButton.addEventListener("click", () => {
-                todo.list.deleteTodo(todo.id);
+                todo.list.deleteTodo(todo);
                 rerenderFn();
             })
 
@@ -591,8 +655,10 @@ class UIController {
             if (validation.isValid) {
                 const title = this.newProjectTitle.value;
                 const description = this.newProjectDesc.value;
-                appController.createProject(title, description);
+                const project = appController.createProject(title, description);
                 this.clearForm("project");
+                appController.setActiveProject(project);
+                appController.switchPage(project);
             } else {
                 validation.invalidInputs.forEach(({ input, reason }) => {
                     this.addErrorMessage(input, reason);

@@ -13,7 +13,7 @@ class Validator {
         if (title === "") {
             isValid = false;
             invalidInputs.push({ input: titleInput, reason: "empty" });
-        } else if (title.length > 14) {
+        } else if (title.length > 21) {
             isValid = false;
             invalidInputs.push({ input: titleInput, reason: "too_long" });
         }
