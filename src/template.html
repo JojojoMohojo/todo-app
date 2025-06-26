@@ -9,7 +9,8 @@
     <div class="sidebar">
         <div class="logo-wrapper">
             <img class="logo" src="images/you-do-logo.png" alt="You-do logo">
-        </div>        
+        </div>
+        <div class="horizontal-divider nav-divider"></div>        
         <nav>
             <div class="links">
                 <div class="nav-home pointer">
@@ -20,14 +21,13 @@
                     <img class="new-project-icon nav-icon" src="icons/add.svg" alt="New project icon">
                     <div class="new-project-button bold">New Project</div>
                 </div>
-                <ul class="project-list">
-                    
-                </ul>
+                <div class="horizontal-divider nav-divider"></div>
+                <ul class="project-list"></ul>
             </div>
-            <div class="sidebar-icons">
+            <!-- <div class="sidebar-icons">
                 <img class="icon pointer" src="icons/profile.svg" alt="Profile icon">
                 <img class="icon pointer" src="icons/settings.svg" alt="Settings icon">
-            </div>
+            </div> -->
         </nav>
     </div>
     <div class="main">
@@ -35,7 +35,9 @@
             <div class="header">
                 <div class="header-container">
                     <div class="title-icon"></div>
-                    <div class="page-title">Home</div>
+                    <div class="page-title-wrapper">
+                        <div class="page-title">Home</div>
+                    </div>
                 </div>
             </div>
             <div class="content"></div> 
@@ -46,16 +48,16 @@
                 <fieldset class="remove-border-background">
                     <div class="form-row">
                         <label for="new-project-title">Title</label>
-                        <input id="new-project-title" type="text" name="title" maxlength="39" placeholder="Cutting starts now!">
+                        <input id="new-project-title" type="text" name="title" maxlength="21" placeholder="Cutting starts now!">
                     </div>
                     <div class="form-row">
                         <label for="new-project-desc">Description</label>
-                        <textarea id="new-project-desc" name="description" rows="3" autocorrect="on" maxlength="120" placeholder="I want to reach a body fat percentage of 15% by August 1st"></textarea>
+                        <textarea id="new-project-desc" name="description" rows="3" autocorrect="on" maxlength="200" placeholder="I want to reach a body fat percentage of 15% by August 1st"></textarea>
                     </div>
                 </fieldset>
                 <div class="new-project-form-buttons bold">
-                    <button type="create" id="create-project-button">Create</button>
                     <button id="close-project-button">Cancel</button>
+                    <button type="create" id="create-project-button">Create</button> 
                 </div>
             </form>
         </dialog>
@@ -69,8 +71,8 @@
                     </div>
                 </fieldset>
                 <div class="new-list-form-buttons bold">
-                    <button type="create" id="create-list-button">Create</button>
                     <button id="close-list-button">Cancel</button>
+                    <button type="create" id="create-list-button">Create</button>
                 </div>
             </form>
         </dialog>
@@ -99,8 +101,8 @@
                     </div>
                 </fieldset>
                 <div class="new-todo-form-buttons bold">
-                    <button type="create" id="create-todo-button">Create</button>
                     <button id="close-todo-button">Cancel</button>
+                    <button type="create" id="create-todo-button">Create</button>
                 </div>
             </form>
         </dialog>

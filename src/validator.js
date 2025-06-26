@@ -1,6 +1,4 @@
-import { List } from "./list";
-
-class FormValidator {
+class Validator {
     constructor() {
 
     }
@@ -15,7 +13,7 @@ class FormValidator {
         if (title === "") {
             isValid = false;
             invalidInputs.push({ input: titleInput, reason: "empty" });
-        } else if (title.length > 39) {
+        } else if (title.length > 21) {
             isValid = false;
             invalidInputs.push({ input: titleInput, reason: "too_long" });
         }
@@ -88,6 +86,26 @@ class FormValidator {
 
         return { isValid, invalidInputs };
     }
+
+    validateTodoDate(dateInput) {
+        let isValid = true;
+        let invalidInputs = [];
+
+        const date = dateInput.valueAsDate;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (!date) {
+            isValid = false;
+            invalidInputs.push({ input: dateInput, reason: "empty" });
+        } else if (date < today) {
+            isValid = false;
+            invalidInputs.push({ input: dateInput, reason: "invalid" });
+        }
+
+        return { isValid, invalidInputs };
+    }
+
 }
 
-export const formValidator = new FormValidator();
+export const validator = new Validator();

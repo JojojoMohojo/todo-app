@@ -2,13 +2,14 @@ import { appController } from "./app-controller";
 import { svg } from "./svg";
 import { format } from "date-fns";
 import { VirtualList } from "./virtual-list";
-import { formValidator } from "./form-validator";
+import { validator } from "./validator";
 
 class UIController {
     constructor() {
         this.content = document.querySelector(".content");
         this.titleIcon = document.querySelector(".title-icon");
-        this.pageTitle = document.querySelector(".page-title")
+        this.pageTitle = document.querySelector(".page-title");
+        this.pageTitleEditHandler = null;
 
         //Side bar
         this.homeButton = document.querySelector(".nav-home");
@@ -56,6 +57,7 @@ class UIController {
                 this.createProjectElement(project)
             }
         });
+        this.highlightActiveProject(appController.getActiveProject());
     }
 
     createProjectElement(project) {
@@ -82,16 +84,14 @@ class UIController {
         deleteIcon.classList.add("nav-icon");
         deleteIcon.innerHTML = svg.getSvgIcons().trashIcon;
 
-        deleteIcon.addEventListener("click", () => {
-            appController.deleteProject(project.id);
-            console.log("click");
+        deleteIcon.addEventListener("click", (e) => {
+            e.stopPropagation();
+            appController.deleteProject(project);
         });
 
         const description = document.createElement("div");
         description.classList.add("nav-project-desc");
-        project.description.length <= 35 ?
-            description.innerHTML = project.description :
-            description.innerHTML = project.description.slice(0, 35).trim() + "...";
+        description.innerHTML = project.description;
 
         projectContainer.addEventListener("click", () => {
             appController.switchPage(project);
@@ -106,9 +106,29 @@ class UIController {
     }
 
     renderHomePage() {
+        const titleWrapper = document.querySelector(".page-title-wrapper");
+
+        // Clear and recreate the pageTitle to make sure it always exists on reload
+        titleWrapper.innerHTML = "";
+        this.pageTitle = document.createElement("div");
+        this.pageTitle.classList.add("page-title");
+        this.pageTitle.textContent = "Home";
+
+        titleWrapper.appendChild(this.pageTitle);
+
         this.pageTitle.textContent= "Home";
         this.titleIcon.innerHTML = svg.getSvgIcons().homeIcon;
+
+        if (this.pageTitleEditHandler) {
+            this.pageTitle.removeEventListener("dblclick", this.pageTitleEditHandler);
+            this.pageTitleEditHandler = null;
+        }
+
         this.clearContent();
+
+        const horizontalDivider = document.createElement("div");
+        horizontalDivider.classList.add("horizontal-divider", "main-divider");
+        this.content.appendChild(horizontalDivider);
 
         const projects = appController.getProjects();
         const todayDate = new Date();
@@ -148,76 +168,117 @@ class UIController {
     
     renderProjectPage() {
         const project = appController.getActiveProject();
+
+        // Clear and recreate the pageTitle to make sure it always exists on reload
+        const titleWrapper = document.querySelector(".page-title-wrapper");
+        titleWrapper.innerHTML = "";
+        this.pageTitle = document.createElement("div");
+        this.pageTitle.classList.add("page-title");
+        this.pageTitle.textContent = project.title;
+
+        titleWrapper.appendChild(this.pageTitle);
+
         this.pageTitle.textContent = project.title;
         this.titleIcon.innerHTML = svg.getSvgIcons().projectIcon;
+
+        if (this.pageTitleEditHandler) {
+            this.pageTitle.removeEventListener("dblclick", this.pageTitleEditHandler);
+        }
+
+        this.pageTitleEditHandler = () => {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = this.pageTitle.textContent;
+            input.classList.add("edit-input", "project-edit-input");
+            input.setAttribute("maxlength", "21");
+
+            const rect = this.pageTitle.getBoundingClientRect();
+            input.style.width = `${rect.width + 30}px`;
+
+            this.pageTitle.replaceWith(input);
+            input.focus();
+
+            input.addEventListener("input", () => {
+                input.style.width = "1px";
+                input.style.width = `${input.scrollWidth + 1}px`;
+            });
+
+            const commitEdit = () => {
+                appController.getActiveProject().changeTitle(input.value);
+                this.renderProjectsList();                    
+                this.rerenderPage();
+            };
+
+            input.addEventListener("blur", commitEdit);
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") e.preventDefault(), input.blur();
+            });
+        };
+        this.pageTitle.addEventListener("dblclick", this.pageTitleEditHandler);
+
+        // Clear content and then recreate it 
         this.clearContent();
+        
+        const horizontalDivider = document.createElement("div");
+        horizontalDivider.classList.add("horizontal-divider", "main-divider");
+        this.content.appendChild(horizontalDivider);
+
+        const projectInfo = document.createElement("div");
+        projectInfo.classList.add("project-info");
+        this.content.appendChild(projectInfo);
+
+        const newListButton = document.createElement("div");
+        newListButton.classList.add("new-list-button", "pointer");
+        newListButton.innerHTML = svg.getSvgIcons().addListIcon;
+        projectInfo.appendChild(newListButton);
+
+        newListButton.addEventListener("click", () => {
+            this.openDialog("list");
+        });
+
+        const verticalDivider = document.createElement("div");
+        verticalDivider.classList.add("vertical-divider", "project-info-divider");
+        projectInfo.appendChild(verticalDivider);
+
+        const descriptionContainer = document.createElement("div");
+        descriptionContainer.classList.add("desc-container");
+        projectInfo.appendChild(descriptionContainer);
 
         const description = document.createElement("div");
         description.classList.add("project-description");
         description.textContent = project.description;
-        this.content.appendChild(description);
+        descriptionContainer.appendChild(description);
 
-        description.addEventListener("dblclick", () => {
+        // Listener to edit description with double click
+        descriptionContainer.addEventListener("dblclick", () => {
             const textarea = document.createElement("textarea");
             textarea.value = project.description;
             textarea.classList.add("edit-input");
             textarea.id = "desc-edit-input";
-            textarea.style.margin = 0;
-            textarea.style.padding = getComputedStyle(description).padding;
-
-            // Clone to measure initial size
-            const descriptionClone = description.cloneNode(true);
-            descriptionClone.style.visibility = "hidden";
-            descriptionClone.style.position = "absolute";
-            descriptionClone.style.whiteSpace = "pre-wrap";
-            descriptionClone.className = description.className;
-            descriptionClone.style.fontSize = getComputedStyle(description).fontSize;
-            descriptionClone.style.fontFamily = getComputedStyle(description).fontFamily;
-            descriptionClone.style.lineHeight = getComputedStyle(description).lineHeight;
-            descriptionClone.style.width = getComputedStyle(description).width;
-            descriptionClone.style.padding = getComputedStyle(description).padding;
-            descriptionClone.textContent = project.description;
-            document.body.appendChild(descriptionClone);
-
-            textarea.style.width = `${descriptionClone.offsetWidth}px`;
-            textarea.style.height = `${descriptionClone.offsetHeight + 5}px`;
-
-            document.body.removeChild(descriptionClone);
+            textarea.style.overflow = "hidden";
+            textarea.style.resize = "none";
+            textarea.setAttribute("maxlength", "200");
 
             description.replaceWith(textarea);
             textarea.focus();
 
             const commitEdit = () => {
-                debugger;
                 project.changeDescription(textarea.value);
                 this.rerenderPage();
+                this.renderProjectsList();
             };
 
             textarea.addEventListener("blur", commitEdit);
             textarea.addEventListener("keydown", (e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault(); // prevent line break
+                    e.preventDefault();
                     textarea.blur();
                 }
             });
         });
 
-        const newListContainer = document.createElement("div");
-        newListContainer.classList.add("new-list-container");
-        newListContainer.classList.add("pointer");
-        newListContainer.classList.add("bold");
-        newListContainer.textContent = "New list";
-
-        const newList = document.createElement("div");
-        newList.classList.add("new-list-button");
-        newList.innerHTML = svg.getSvgIcons().addListIcon;
-
-        newListContainer.appendChild(newList);
-        this.content.appendChild(newListContainer);
-
-        newListContainer.addEventListener("click", () => {
-            this.openDialog("list");
-        });
+        const dividerClone = horizontalDivider.cloneNode(true);
+        this.content.appendChild(dividerClone);
 
         project.lists.forEach(list => {
             list.todos.sort((a, b) => a.priority - b.priority);
@@ -277,7 +338,7 @@ class UIController {
             headingContainer.appendChild(deleteListButton);
 
             deleteListButton.addEventListener("click", () => {
-                list.project.deleteList(list.id);
+                list.project.deleteList(list);
                 rerenderFn();
             })
 
@@ -292,48 +353,28 @@ class UIController {
                 const input = document.createElement("input");
                 input.type = "text";
                 input.value = list.title;
-                input.classList.add("edit-input");
-                input.classList.add("list-edit-input");
+                input.classList.add("edit-input", "list-edit-input");
+                input.setAttribute("maxlength", "36");
 
-                // Clone to measure original width
-                const headingClone = heading.cloneNode(true);
-                headingClone.style.visibility = "hidden";
-                headingClone.style.position = "absolute";
-                headingClone.style.whiteSpace = "pre";
-                headingClone.style.fontSize = getComputedStyle(heading).fontSize;
-                headingClone.style.fontFamily = getComputedStyle(heading).fontFamily;
-                document.body.appendChild(headingClone);
-
-                const headingWidth = headingClone.offsetWidth;
-                input.style.width = `${headingWidth + 25}px`;
-                document.body.removeChild(headingClone);
-
-                // Live resizing mirror
-                const mirror = document.createElement("span");
-                mirror.style.position = "absolute";
-                mirror.style.visibility = "hidden";
-                mirror.style.whiteSpace = "pre";
-                mirror.style.fontSize = getComputedStyle(heading).fontSize;
-                mirror.style.fontFamily = getComputedStyle(heading).fontFamily;
-                document.body.appendChild(mirror);
-
-                input.addEventListener("input", () => {
-                    mirror.textContent = input.value || " ";
-                    input.style.width = `${mirror.offsetWidth + 10}px`;
-                });
+                const rect = heading.getBoundingClientRect();
+                input.style.width = `${rect.width + 30}px`;
 
                 heading.replaceWith(input);
                 input.focus();
 
+                input.addEventListener("input", () => {
+                    input.style.width = "1px";
+                    input.style.width = `${input.scrollWidth + 1}px`;
+                });
+
                 const commitEdit = () => {
-                    list.changeTitle(input.value);
+                    list.changeTitle(input.value);                    
                     this.rerenderPage();
-                    document.body.removeChild(mirror);
                 };
 
                 input.addEventListener("blur", commitEdit);
                 input.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") input.blur();
+                    if (e.key === "Enter") e.preventDefault(), input.blur();
                 });
             });
         }
@@ -354,53 +395,32 @@ class UIController {
             checkbox.checked = todo.completed;
             container.appendChild(checkbox);
 
-            const label = document.createElement("label");
-            label.setAttribute("for", checkbox.id);
-            label.textContent = todo.description;
+            const description = document.createElement("div");
+            description.classList.add("todo-description");
+            description.textContent = todo.description;
 
-            label.addEventListener("dblclick", () => {
+            description.addEventListener("dblclick", () => {
                 const input = document.createElement("input");
                 input.type = "text";
                 input.value = todo.description;
-                input.classList.add("edit-input");
-                input.classList.add("todo-edit-label-input");
+                input.classList.add("edit-input", "todo-edit-description-input");
+                input.setAttribute("maxlength", "36");
 
-                // Clone label to measure width
-                const labelClone = label.cloneNode(true);
-                labelClone.style.visibility = "hidden";
-                labelClone.style.position = "absolute";
-                labelClone.style.whiteSpace = "pre";
-                labelClone.style.fontSize = getComputedStyle(label).fontSize;
-                labelClone.style.fontFamily = getComputedStyle(label).fontFamily;
-                document.body.appendChild(labelClone);
+                const rect = description.getBoundingClientRect();
+                input.style.width = `${rect.width + 30}px`;
 
-                // Match initial input width to label's width
-                const labelWidth = labelClone.offsetWidth;
-                input.style.width = `${labelWidth + 10}px`;
-                document.body.removeChild(labelClone);
-
-                // Add listener to auto-resize as user types
                 input.addEventListener("input", () => {
-                    mirror.textContent = input.value || " ";
-                    input.style.width = `${mirror.offsetWidth + 10}px`;
+                    input.style.width = "1px";
+                    input.style.width = `${input.scrollWidth + 1}px`;
                 });
 
-                // Create hidden mirror span for live resizing
-                const mirror = document.createElement("span");
-                mirror.style.position = "absolute";
-                mirror.style.visibility = "hidden";
-                mirror.style.whiteSpace = "pre";
-                mirror.style.fontSize = getComputedStyle(label).fontSize;
-                mirror.style.fontFamily = getComputedStyle(label).fontFamily;
-                document.body.appendChild(mirror);
-
-                label.replaceWith(input);
+                description.replaceWith(input);
                 input.focus();
 
                 const commitEdit = () => {
+                    debugger;
                     todo.changeDescription(input.value);
                     this.rerenderPage();
-                    document.body.removeChild(mirror);
                 };
 
                 input.addEventListener("blur", commitEdit);
@@ -409,7 +429,8 @@ class UIController {
                 });
             });
 
-            container.appendChild(label);
+
+            container.appendChild(description);
             
             const date = document.createElement("div");
             date.classList.add("todo-date");
@@ -419,18 +440,32 @@ class UIController {
             date.addEventListener("dblclick", () => {
                 const input = document.createElement("input");
                 input.type = "date";
-                input.valueAsDate = todo.dueDate;
-                input.classList.add("edit-input");
-                input.classList.add("todo-edit-date-input");
+
+                const clonedDate = new Date(todo.dueDate.getTime());
+                clonedDate.setHours(0, 0, 0, 0);
+                const year = clonedDate.getFullYear();
+                const month = String(clonedDate.getMonth() + 1).padStart(2, '0');
+                const day = String(clonedDate.getDate()).padStart(2, '0');
+                input.value = `${year}-${month}-${day}`;
+
+                input.classList.add("edit-input", "todo-edit-date-input");
 
                 date.replaceWith(input);
                 input.focus();
 
                 const commitEdit = () => {
-                    const newDate = input.valueAsDate;
-                    if (newDate) {
-                        todo.changeDueDate(newDate);
+                    const validation = validator.validateTodoDate(input);
+
+                    if (!validation.isValid) {
+                        input.replaceWith(date);
+                        return;
                     }
+
+                    const [year, month, day] = input.value.split("-");
+                    const newDate = new Date(year, month - 1, day);
+                    newDate.setHours(0, 0, 0, 0);
+
+                    todo.changeDueDate(newDate);
                     this.rerenderPage();
                 };
 
@@ -439,6 +474,7 @@ class UIController {
                     if (e.key === "Enter") input.blur();
                 });
             });
+
             container.appendChild(date);
 
             const priority = document.createElement("div");
@@ -446,36 +482,41 @@ class UIController {
             priority.textContent = todo.priority;
 
             priority.addEventListener("dblclick", () => {
-                const input = document.createElement("input");
-                input.type = "number";
-                input.value = todo.priority;
-                input.classList.add("edit-input");
-                input.classList.add("todo-edit-priority-input");
+                const select = document.createElement("select");
+                select.classList.add("edit-input", "todo-edit-priority-input");
 
-                priority.replaceWith(input);
-                input.focus();
+                for (let i = 1; i <= 5; i++) {
+                    const option = document.createElement("option");
+                    option.value = i;
+                    option.textContent = i;
+                    if (i === todo.priority) option.selected = true;
+                    select.appendChild(option);
+                }
+
+                priority.replaceWith(select);
+                select.focus();
 
                 const commitEdit = () => {
-                    const newPriority = parseInt(input.value);
+                    const newPriority = parseInt(select.value);
                     if (!isNaN(newPriority)) {
                         todo.changePriority(newPriority);
                     }
                     this.rerenderPage();
                 };
 
-                input.addEventListener("blur", commitEdit);
-                input.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") input.blur();
+                select.addEventListener("blur", commitEdit);
+                select.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") select.blur();
                 });
             });
             container.appendChild(priority);
 
             if (todo.completed) {
-                label.classList.add("completed-todo-text");
+                description.classList.add("completed-todo-text");
                 date.classList.add("completed-todo-details");
                 priority.classList.add("completed-todo-details");
             } else {
-                label.classList.remove("completed-todo-text");
+                description.classList.remove("completed-todo-text");
                 date.classList.remove("completed-todo-details");
                 priority.classList.remove("completed-todo-details");
             }
@@ -483,11 +524,11 @@ class UIController {
             checkbox.addEventListener("click", () => {
                 todo.changeCompletedStatus();
                 if (todo.completed) {
-                    label.classList.add("completed-todo-text");
+                    description.classList.add("completed-todo-text");
                     date.classList.add("completed-todo-details");
                     priority.classList.add("completed-todo-details");
                 } else {
-                    label.classList.remove("completed-todo-text");
+                    description.classList.remove("completed-todo-text");
                     date.classList.remove("completed-todo-details");
                     priority.classList.remove("completed-todo-details");
                 }
@@ -500,7 +541,7 @@ class UIController {
             container.appendChild(deleteTodoButton);
 
             deleteTodoButton.addEventListener("click", () => {
-                todo.list.deleteTodo(todo.id);
+                todo.list.deleteTodo(todo);
                 rerenderFn();
             })
 
@@ -511,9 +552,6 @@ class UIController {
         section.appendChild(ul);
         return section;
     };
-
-    
-
     
 
     highlightActiveProject(newProject, oldProject) {
@@ -570,16 +608,16 @@ class UIController {
     validateForm(type) {
         switch (type) {
             case "project":
-                return formValidator.validateProjectForm(
+                return validator.validateProjectForm(
                     this.newProjectTitle,
                     this.newProjectDesc
                 );
             case "list":
-                return formValidator.validateListForm(
+                return validator.validateListForm(
                     this.newListTitle
                 );
             case "todo":
-                return formValidator.validateTodoForm(
+                return validator.validateTodoForm(
                     this.newTodoDesc,
                     this.newTodoDate,
                     this.newTodoPriority
@@ -629,8 +667,10 @@ class UIController {
             if (validation.isValid) {
                 const title = this.newProjectTitle.value;
                 const description = this.newProjectDesc.value;
-                appController.createProject(title, description);
+                const project = appController.createProject(title, description);
                 this.clearForm("project");
+                appController.setActiveProject(project);
+                appController.switchPage(project);
             } else {
                 validation.invalidInputs.forEach(({ input, reason }) => {
                     this.addErrorMessage(input, reason);

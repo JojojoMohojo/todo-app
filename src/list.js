@@ -21,8 +21,8 @@ export class List {
         if (appController.getIsLocalStorageActive()) appController.saveToStorage();
     }
 
-    deleteTodo(todoId) {
-        this.todos = this.todos.filter(todo => todo.id !== todoId);
+    deleteTodo(todo) {
+        this.todos = this.todos.filter(item => item.id !== todo.id);
         if (appController.getIsLocalStorageActive()) appController.saveToStorage();
     }
 }

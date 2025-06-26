@@ -43,12 +43,12 @@ class AppController {
         uiController.renderProjectsList(this.projects);
         this.setActiveProject(project);
         uiController.closeDialog("project");
+        return project;
     }
 
-    deleteProject(projectId) { 
-        this.projects = this.projects.filter(project => project.id !== projectId);
-
-        if (projectId === this.activeProject.id) {
+    deleteProject(project) { 
+        this.projects = this.projects.filter(item => item.id !== project.id);
+        if (this.activeProject && project.id === this.activeProject.id) {
             this.switchPage();
         }
         if (this.getIsLocalStorageActive()) this.saveToStorage();
