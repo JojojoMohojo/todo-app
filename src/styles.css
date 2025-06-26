@@ -159,15 +159,23 @@ nav {
   width: auto;
 }
 
-.divider {
-  height: 4px;
+.horizontal-divider,
+.vertical-divider {
   background-color: var(--black);
+  border-radius: 20px;
+}
+
+.horizontal-divider {
+  height: 4px;
+}
+
+.vertical-divider {
+  width: 4px;
 }
 
 .nav-divider {
   width: 90%;
   align-self: center;
-  border-radius: 20px;
 }
 
 .main-divider {
@@ -256,7 +264,6 @@ nav {
 .nav-delete-icon svg {
   fill: var(--uranian-blue);
   transition: fill 0.5s ease;
-  cursor: pointer;
 }
 
 .project:hover .nav-project-name,
@@ -340,14 +347,28 @@ nav {
   height: 118px;
   position: relative;
   display: flex;
-  justify-content: space-between;
   padding: 0px 200px 10px 0px;
+}
+
+.new-list-button {
+  min-height: 100%;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.new-list-button:hover svg {
+  fill: var(--darker-aquamarine);
+  transition: fill 0.3s ease;
+}
+
+.project-info-divider {
+  margin-right: 20px;
 }
 
 .desc-container {
   justify-self: start;
   align-self: start;
-  width: 650px;
+  width: 800px;
 }
 
 .project-description {
@@ -392,31 +413,6 @@ nav {
   outline: none;
 }
 
-.new-list-container {
-  align-self: center;
-}
-
-.new-list-button {
-  display: flex;
-  gap: 20px;
-  width: 200px;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.6rem;
-  background-color: var(--aquamarine);
-  border-radius: 10px;
-  margin: 20px 0 20px 0;
-}
-
-.new-list-button:hover {
-  background-color: var(--darker-aquamarine);
-}
-
-.new-list-icon {
-  margin-top: 3px;
-}
-
-.new-list-icon,
 .delete-list-button {
   display: flex;
   height: 1.8rem;
@@ -578,8 +574,6 @@ svg {
   fill: var(--black);
 }
 
-
-
 .section ul li {
   margin-bottom: 10px;
 }
@@ -600,7 +594,18 @@ svg {
   border: solid 4px var(--black);
   border-radius: 20px;
   z-index: 50;
+}
 
+#close-project-button:hover,
+#close-list-button:hover,
+#close-todo-button:hover {
+  background-color: var(--grey);
+}
+
+#create-project-button:hover,
+#create-list-button:hover,
+#create-todo-button:hover {
+  background-color: var(--aquamarine);
 }
 
 .new-project-form-heading,
@@ -661,10 +666,6 @@ button {
   cursor: pointer;
   background-color: var(--white);
   transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: var(--grey);
 }
 
 ::backdrop {

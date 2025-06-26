@@ -106,10 +106,10 @@ class UIController {
     }
 
     renderHomePage() {
-        console.log("rendered home page");
         const titleWrapper = document.querySelector(".page-title-wrapper");
-        titleWrapper.innerHTML = "";
 
+        // Clear and recreate the pageTitle to make sure it always exists on reload
+        titleWrapper.innerHTML = "";
         this.pageTitle = document.createElement("div");
         this.pageTitle.classList.add("page-title");
         this.pageTitle.textContent = "Home";
@@ -126,9 +126,9 @@ class UIController {
 
         this.clearContent();
 
-        const divider = document.createElement("div");
-        divider.classList.add("divider", "main-divider");
-        this.content.appendChild(divider);
+        const horizontalDivider = document.createElement("div");
+        horizontalDivider.classList.add("horizontal-divider", "main-divider");
+        this.content.appendChild(horizontalDivider);
 
         const projects = appController.getProjects();
         const todayDate = new Date();
@@ -168,9 +168,10 @@ class UIController {
     
     renderProjectPage() {
         const project = appController.getActiveProject();
-        const titleWrapper = document.querySelector(".page-title-wrapper");
-        titleWrapper.innerHTML = ""; // clear previous content
 
+        // Clear and recreate the pageTitle to make sure it always exists on reload
+        const titleWrapper = document.querySelector(".page-title-wrapper");
+        titleWrapper.innerHTML = "";
         this.pageTitle = document.createElement("div");
         this.pageTitle.classList.add("page-title");
         this.pageTitle.textContent = project.title;
@@ -213,17 +214,31 @@ class UIController {
                 if (e.key === "Enter") e.preventDefault(), input.blur();
             });
         };
-
         this.pageTitle.addEventListener("dblclick", this.pageTitleEditHandler);
+
+        // Clear content and then recreate it 
         this.clearContent();
         
-        const divider = document.createElement("div");
-        divider.classList.add("divider", "main-divider");
-        this.content.appendChild(divider);
+        const horizontalDivider = document.createElement("div");
+        horizontalDivider.classList.add("horizontal-divider", "main-divider");
+        this.content.appendChild(horizontalDivider);
 
         const projectInfo = document.createElement("div");
         projectInfo.classList.add("project-info");
         this.content.appendChild(projectInfo);
+
+        const newListButton = document.createElement("div");
+        newListButton.classList.add("new-list-button", "pointer");
+        newListButton.innerHTML = svg.getSvgIcons().addListIcon;
+        projectInfo.appendChild(newListButton);
+
+        newListButton.addEventListener("click", () => {
+            this.openDialog("list");
+        });
+
+        const verticalDivider = document.createElement("div");
+        verticalDivider.classList.add("vertical-divider", "project-info-divider");
+        projectInfo.appendChild(verticalDivider);
 
         const descriptionContainer = document.createElement("div");
         descriptionContainer.classList.add("desc-container");
@@ -234,6 +249,7 @@ class UIController {
         description.textContent = project.description;
         descriptionContainer.appendChild(description);
 
+        // Listener to edit description with double click
         descriptionContainer.addEventListener("dblclick", () => {
             const textarea = document.createElement("textarea");
             textarea.value = project.description;
@@ -241,7 +257,7 @@ class UIController {
             textarea.id = "desc-edit-input";
             textarea.style.overflow = "hidden";
             textarea.style.resize = "none";
-            textarea.setAttribute("maxlength", "120");
+            textarea.setAttribute("maxlength", "200");
 
             description.replaceWith(textarea);
             textarea.focus();
@@ -261,26 +277,7 @@ class UIController {
             });
         });
 
-        const newListContainer = document.createElement("div");
-        newListContainer.classList.add("new-list-container");
-        projectInfo.appendChild(newListContainer);
-
-        const newListButton = document.createElement("div");
-        newListButton.classList.add("new-list-button", "pointer", "bold");
-        newListButton.textContent = "New List";
-
-        const newListIcon = document.createElement("div");
-        newListIcon.classList.add("new-list-icon");
-        newListIcon.innerHTML = svg.getSvgIcons().addListIcon;
-
-        newListButton.appendChild(newListIcon);
-        newListContainer.appendChild(newListButton);
-
-        newListButton.addEventListener("click", () => {
-            this.openDialog("list");
-        });
-        
-        const dividerClone = divider.cloneNode(true);
+        const dividerClone = horizontalDivider.cloneNode(true);
         this.content.appendChild(dividerClone);
 
         project.lists.forEach(list => {
@@ -443,18 +440,32 @@ class UIController {
             date.addEventListener("dblclick", () => {
                 const input = document.createElement("input");
                 input.type = "date";
-                input.valueAsDate = todo.dueDate;
-                input.classList.add("edit-input");
-                input.classList.add("todo-edit-date-input");
+
+                const clonedDate = new Date(todo.dueDate.getTime());
+                clonedDate.setHours(0, 0, 0, 0);
+                const year = clonedDate.getFullYear();
+                const month = String(clonedDate.getMonth() + 1).padStart(2, '0');
+                const day = String(clonedDate.getDate()).padStart(2, '0');
+                input.value = `${year}-${month}-${day}`;
+
+                input.classList.add("edit-input", "todo-edit-date-input");
 
                 date.replaceWith(input);
                 input.focus();
 
                 const commitEdit = () => {
-                    const newDate = input.valueAsDate;
-                    if (newDate) {
-                        todo.changeDueDate(newDate);
+                    const validation = validator.validateTodoDate(input);
+
+                    if (!validation.isValid) {
+                        input.replaceWith(date);
+                        return;
                     }
+
+                    const [year, month, day] = input.value.split("-");
+                    const newDate = new Date(year, month - 1, day);
+                    newDate.setHours(0, 0, 0, 0);
+
+                    todo.changeDueDate(newDate);
                     this.rerenderPage();
                 };
 
@@ -463,6 +474,7 @@ class UIController {
                     if (e.key === "Enter") input.blur();
                 });
             });
+
             container.appendChild(date);
 
             const priority = document.createElement("div");
