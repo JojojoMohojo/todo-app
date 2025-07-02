@@ -12,7 +12,9 @@
     "start": "webpack serve --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
     "merge gh-pages": "git checkout gh-pages && git merge main --no-edit",
-    "deploy": "git add dist -f && git commit -m 'Deployment commit' && git subtree push --prefix dist origin gh-pages"
+    "push gh-pages": "git subtree push --prefix dist origin gh-pages",
+    "deploy": "git add dist -f && git commit -m 'Deployment commit' && git subtree push --prefix dist origin gh-pages",
+    "checkout main": "git checkout main"
   },
   "dependencies": {
     "date-fns": "^4.1.0",
