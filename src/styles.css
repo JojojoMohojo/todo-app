@@ -102,12 +102,6 @@ textarea {
   padding: 0px 5px 0px 5px;
 }
 
-* {
-  box-sizing: border-box;
-  /* border: solid red 0.1px; */
-}
-
-
 .bold {
   font-weight: 600;
 }
@@ -189,7 +183,6 @@ nav {
   height: 100%;
   display: flex;
   flex-direction: column;
-  margin-bottom: 0px;
 }
 
 .link {
@@ -347,7 +340,7 @@ nav {
   height: 118px;
   position: relative;
   display: flex;
-  padding: 0px 200px 10px 0px;
+  padding: 0px 100px 10px 0px;
 }
 
 .new-list-button {
@@ -476,7 +469,7 @@ svg {
   box-sizing: border-box;
   height: 34px;
   width: auto;
-  max-width: 700px;
+  max-width: 1200px;
   display: flex;
   align-items: center;
   gap: 15px;

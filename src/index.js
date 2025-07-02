@@ -5,7 +5,17 @@ import { uiController } from "./ui-controller.js";
 uiController.setUpEventListeners();
 // Check if local storage is available and load it if so
 appController.setIsLocalStorageActive(storageAvailable("localStorage"));
-if (appController.getIsLocalStorageActive()) appController.loadFromStorage();
+if (appController.getIsLocalStorageActive()) {
+  console.log("Loading from Storage");
+  appController.loadFromStorage();
+  if (appController.projects.length === 0) {
+    console.log("No projects found in storage - creating example projects");
+    createDummyProjects();
+  }
+} else {
+  console.log("Creating example projects");
+  createDummyProjects();
+}
 
 function storageAvailable(type) {
   let storage;
@@ -26,30 +36,66 @@ function storageAvailable(type) {
   }
 };
 
-//Temporary functions
-if (false === true) {
-    createDummyProjects();
-}
-
 function createDummyProjects() {
-    appController.createProject("Time to cut", "The plan is to cut around 8kg before September. Start slow and measure weight loss along the way. Maybe start to measure body fat at some point.");
-    appController.createProject("Get a new job", "Get a job in programming before July rolls around");
-    createDummyLists();
+  appController.createProject("Welcome to You-do!", "This is an example project that you can edit to your liking. Double click on the project name or description to change it to something else, or create a new project! Click the icon to the left of me to create a new list for this Project.");
+  createDummyLists();
 }
 
 function createDummyLists() {
-    appController.projects[1].createList("Setup phase - 3 weeks", appController.projects[0]);
-    appController.projects[1].createList("Mid phase - 3 months", appController.projects[1]);
-    createDummyTodos();
+  appController.projects[0].createList("These are your lists", appController.projects[0]);
+  appController.projects[0].createList("Add new todos to your lists", appController.projects[0]);
+  createDummyTodos();
 }
 
 function createDummyTodos() {
-    appController.projects[1].lists[0].createTodo("Log foods every day", new Date("2025-04-29"), 1, appController.projects[1].lists[0]);
-    appController.projects[1].lists[0].createTodo("Weigh myself every day", new Date("2025-05-19"), 2, appController.projects[1].lists[0]);
-    appController.projects[1].lists[0].createTodo("Don't eat too much food", new Date("2025-04-30"), 3, appController.projects[1].lists[0]);
-    appController.projects[1].lists[1].createTodo("Maintain protein intake", new Date("2025-04-05"), 2, appController.projects[1].lists[1]);
-    appController.projects[1].lists[1].createTodo("Measure body fat percentage every week", new Date("2025-05-16"), 3, appController.projects[1].lists[1]);
-    appController.projects[1].lists[1].createTodo("Decrease calorie intake as time progresses", new Date("2025-06-29"), 5, appController.projects[1].lists[1]);
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+
+  const tomorrowDate = new Date(todayDate);
+  tomorrowDate.setDate(todayDate.getDate() + 1);
+
+  console.log(appController.projects[0].lists[0]);
+
+  appController.projects[0].lists[0].createTodo("You can double click me too!",
+    new Date("2025-07-05"),
+    1,
+    appController.projects[0].lists[0]
+  );
+
+  appController.projects[0].lists[0].createTodo(
+    "Double click the date or priority to change it",
+    new Date("2025-07-20"),
+    2,
+    appController.projects[0].lists[0]
+  );
+
+  appController.projects[0].lists[1].createTodo(
+    "You will see me on the Home page under 'Due'",
+    todayDate,
+    3,
+    appController.projects[0].lists[1]
+  );
+  
+  appController.projects[0].lists[1].createTodo(
+    "Me too! I'm due today but a lower priority",
+    todayDate,
+    4,
+    appController.projects[0].lists[1]
+  );
+
+  appController.projects[0].lists[1].createTodo(
+    "I should appear under Tomorrow",
+    tomorrowDate,
+    1,
+    appController.projects[0].lists[1]
+  );
+
+  appController.projects[0].lists[1].createTodo(
+    "Any todos not due today or tomorrow are Upcoming",
+    new Date("2025-10-29"),
+    5, 
+    appController.projects[0].lists[1]
+  );
 }
 
 // End of temporary functions
