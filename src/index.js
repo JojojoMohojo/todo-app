@@ -37,7 +37,7 @@ function storageAvailable(type) {
 };
 
 function createDummyProjects() {
-  appController.createProject("Welcome to You-do!", "This is an example project that you can edit to your liking. Double click on the project name or description to change it to something else, or create a new project! Click the icon to the left of me to create a new list for this Project.");
+  appController.createProject("Welcome to You-do!", "This is an example project that you can edit to your liking. Double click/hold on the project name or description to change it to something else, or create a new project! Click/tap the list icon next to me to create a new list for this Project.");
   createDummyLists();
 }
 
@@ -56,14 +56,14 @@ function createDummyTodos() {
 
   console.log(appController.projects[0].lists[0]);
 
-  appController.projects[0].lists[0].createTodo("You can double click me too!",
+  appController.projects[0].lists[0].createTodo("You can double click/hold me too!",
     new Date("2025-07-05"),
     1,
     appController.projects[0].lists[0]
   );
 
   appController.projects[0].lists[0].createTodo(
-    "Double click the date or priority to change it",
+    "Double click/hold the date or priority to change it",
     new Date("2025-07-20"),
     2,
     appController.projects[0].lists[0]

@@ -121,14 +121,15 @@ textarea {
 
 .sidebar {
   position: fixed;
-  height: 100vh;
-  width: 350px;
+  height: 100%;
+  width: 100%;
+  max-width: 350px;
   display: flex;
   flex-direction: column;
   flex: 1;
   color: var(--black);
   background-color: var(--uranian-blue);
-  font-size: 1.4rem;
+  font-size: clamp(0.9rem, 1.5vw, 1.4rem);
   border-right: solid 4px var(--black);
   z-index: 100;
 }
@@ -144,7 +145,7 @@ nav {
   display: flex;
   justify-content: center;
   position: relative;
-  height: 125px;
+  height: clamp(6rem, 14vh, 125px);
   padding: 10px;
 }
 
@@ -227,6 +228,7 @@ nav {
 
 .nav-project-name,
 .nav-project-desc {
+  font-size: clamp(1.2rem, 1.5vw, 1.4rem);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -296,7 +298,6 @@ nav {
   display: flex;
   flex-direction: column;
   flex: 5;
-  font-size: 3.5rem;
 }
 
 .page {
@@ -307,6 +308,11 @@ nav {
 
 .header-container {
   display: flex;
+  align-items: center;
+}
+
+.menu-toggle {
+  display: none;
 }
 
 .header {
@@ -321,8 +327,12 @@ nav {
 }
 
 .title-icon {
-  height: 4.5rem;
+  height: clamp(2rem, 5vw, 4.5rem);
   margin: 10px 10px 0 0;
+}
+
+.page-title-wrapper {
+  font-size: clamp( 1.6rem, 3vw, 3.5rem);
 }
 
 .page-title {
@@ -344,7 +354,8 @@ nav {
 }
 
 .new-list-button {
-  min-height: 100%;
+  height: clamp(2.5rem, 10vw, 6.5rem);
+  min-height: 20px;
   cursor: pointer;
   margin-right: 10px;
 }
@@ -359,6 +370,7 @@ nav {
 }
 
 .desc-container {
+  font-size: clamp(0.9rem, 1.5vw, 1.4rem);
   justify-self: start;
   align-self: start;
   width: 800px;
@@ -366,7 +378,6 @@ nav {
 
 .project-description {
   box-sizing: border-box;
-  font-size: 1.4rem;
   color: var(--grey);
   height: 100px;
   width: 100%;
@@ -375,7 +386,7 @@ nav {
 
 .edit-input {
   font-family: inherit;
-  font-size: 1rem;
+  font-size: inherit;
   box-sizing: border-box;
   color: var(--black);
   background-color: var(--white);
@@ -390,14 +401,13 @@ nav {
   box-shadow: 0 0 0 2px rgba(189, 224, 254, 0.5);
 }
 
-#desc-edit-input {
+.desc-edit-input {
   max-width: 100%;
   max-height: 100px;
   width: 100%;
   height: 100px;
   margin: 0;
   padding: 4px 6px;
-  font-size: 1.4rem;
   line-height: 1.4;
   box-sizing: border-box;
   overflow: hidden;
@@ -423,7 +433,7 @@ nav {
 }
 
 .no-todos {
-  font-size: 1.4rem;
+  font-size: clamp(0.9rem, 1.5vw, 1.4rem);
 }
 
 svg {
@@ -447,6 +457,8 @@ svg {
 .heading-container {
   display: flex;
   align-items: center;
+  font-size: clamp(1.1rem, 1.5vw, 2rem);
+  font-weight: 500;
   padding-bottom: 8px;
   gap: 10px;
 }
@@ -461,7 +473,6 @@ svg {
 }
 
 .heading {
-  font-size: 2rem;
   max-height: 48px;
 }
 
@@ -472,12 +483,25 @@ svg {
   max-width: 1200px;
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
+}
+
+.todo-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.todo-right {
+  font-size: clamp(0.7rem, 1.5vw, 1rem);
+  display: flex;
+  gap: 20px;
+  align-items: center;
 }
 
 .project-edit-input {
   font-family: inherit;
-  font-size: 3.5rem;
+  font-size: inherit;
   padding: 4px 6px;
   box-sizing: border-box;
   max-height: 84px;
@@ -490,8 +514,9 @@ svg {
 
 .list-edit-input {
   font-family: inherit;
-  font-size: 2rem;
-  padding: 4px 6px;
+  font-size: inherit;
+  font-weight: inherit;
+  padding: 2px 6px;
   box-sizing: border-box;
   max-height: 48px;
   height: 100%;
@@ -504,7 +529,7 @@ svg {
 .todo.edit-description-input,
 .todo-edit-date-input,
 .todo-edit-priority-input {
-  font-size: 1rem;
+  font-size: inherit;
   font-family: inherit;
   padding: 0 4px;
   box-sizing: border-box;
@@ -518,19 +543,19 @@ svg {
 }
 
 .todo-description {
-  font-size: 1.4rem;
+  font-size: clamp(0.9rem, 1.5vw, 1.4rem);
 }
 
 .todo-edit-description-input {
   max-height: 34px;
-  font-size: 1.4rem;
+  font-size: clamp(0.9rem, 1.5vw, 1.4rem);
 }
 
 .todo-date,
 .todo-priority {
-  font-size: 1rem;
   padding: 0px 5px;
   border-radius: 5px;
+  text-align: center;
 }
 
 .todo-date {
@@ -578,10 +603,9 @@ svg {
   top: 25%;
   left: 50%;
   transform: translate(-50%);
-  width: 500px;
+  width: 25%;
   padding: 10px 20px 25px 20px;
   margin: 0;
-  font-size: 1.2rem;
   background-color: var(--thistle);
   color: var(--black);
   border: solid 4px var(--black);
@@ -604,7 +628,7 @@ svg {
 .new-project-form-heading,
 .new-list-form-heading,
 .new-todo-form-heading {
- font-size: 2rem;
+ font-size: clamp(1.8rem, 1.8vw, 2.2rem);
  text-align: center;
 }
 
@@ -629,14 +653,14 @@ fieldset {
 }
 
 label {
-  font-size: 1.4rem;
+  font-size: clamp(0.9rem, 1.5vw, 1.4rem);
   display: block;
 }
 
 input, select, textarea {
   width: 100%;
   padding: 5px 10px 5px 10px;
-  font-size: 1.4rem;
+  font-size: clamp(0.9rem, 1.5vw, 1.4rem);
   border-radius: 10px;
 }
 
@@ -652,6 +676,7 @@ input, select, textarea {
 .new-todo-form-buttons > button {
   height: 35px;
   width: 110px;
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
 }
 
 button {
@@ -691,3 +716,225 @@ button {
   border-color: transparent transparent white transparent;
 }
 
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .nav-divider,
+  .main-divider,
+  .section::after {
+    max-height: 3px;
+  }
+
+  .sidebar {
+    position: fixed;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: solid 5px var(--black);
+    left: 0;
+    top: -100%;
+    z-index: 200;
+    transition: top 0.3s ease-in-out;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  }
+
+  .sidebar.open {
+    top: 0;
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .sidebar.open + .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+
+  .logo-wrapper {
+    height: clamp(6rem, 10vh, 125px);
+  }
+
+  .nav-home,
+  .nav-new-project {
+    height: 50px;
+    font-size: 1.5rem;
+    padding-left: 1rem;
+  }
+
+  .main {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .page {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .header {
+    position: relative;
+    height: auto;
+    min-height: 50px;
+    justify-content: center;
+    padding: 5px 0 5px 0;
+  }
+
+  .menu-toggle {
+    position: absolute;
+    height: 1rem;
+    width: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 5px;
+    top: 5px;
+    border-radius: 2px;
+  }
+
+  .title-icon {
+    margin: 5px 10px 0 0;
+  }
+
+  .main-divider {
+    margin-bottom: 5px;
+  }
+
+  .project-info {
+    flex-direction: column;
+    height: auto;
+    padding: 10px;
+  }
+
+  .desc-container {
+    width: 100%;
+  }
+
+  .project-description {
+    height: auto;
+  }
+
+  .new-project-dialog,
+  .new-list-dialog,
+  .new-todo-dialog {
+    width: 95%;
+  }
+
+  .section {
+    margin-bottom: 25px;
+  }
+
+  .section::after {
+    bottom: -17px;
+    left: 18px;
+    width: 90%;
+  }
+
+  .heading-container {
+    padding: 0;
+  }
+
+  .heading {
+    margin-bottom: 5px;
+  }
+
+  .list-item-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 5px;
+  }
+
+  .todo-left {
+    gap: 10px;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .todo-right {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .todo-description {
+    width: auto;
+    max-width: 250px;
+    justify-self: start;
+  }
+
+  input[type='checkbox'] {
+    height: 0.9rem;
+    min-height: 0.9rem;
+    width: 0.9rem;
+    min-width: 0.9rem;
+  }
+
+  input[type='checkbox']:checked {
+    background-color: var(--grey);
+  }
+
+  input[type='checkbox']:checked::after {
+    content: "";
+    position: absolute;
+    left: 0.19rem;
+    top: 0.03rem;
+    width: 0.25rem;
+    height: 0.5rem;
+    border: solid var(--white);
+    border-width: 0 1.2px 1.2px 0;
+    transform: rotate(45deg);
+  }
+
+  .todo-date,
+  .todo-priority {
+    padding: 0px 5px;
+    justify-self: end;
+  }
+
+  .todo-date {
+    min-width: 70px;
+  }
+
+  .todo-edit-date-input {
+    max-width: 85px;
+  }
+
+  .todo-edit-priority-input {
+    min-width: 35px;
+    max-width: 35px;
+  }
+
+  .new-project-form-buttons button,
+  .new-list-form-buttons button,
+  .new-todo-form-buttons button {
+    width: 45%;
+  }
+
+  .new-todo-button,
+  .delete-list-button,
+  .delete-todo-button {
+    height: 1.3rem;
+    width: 1.3rem;
+    min-height: 1.3rem;
+    min-width: 1.3rem;
+  }
+
+  .new-todo-button,
+  .delete-list-button {
+    margin-bottom: 5px;
+  }
+}

@@ -7,6 +7,8 @@ import { validator } from "./validator";
 class UIController {
     constructor() {
         this.content = document.querySelector(".content");
+        this.menuToggle = document.querySelector(".menu-toggle");
+        this.sidebar = document.querySelector(".sidebar");
         this.titleIcon = document.querySelector(".title-icon");
         this.pageTitle = document.querySelector(".page-title");
         this.pageTitleEditHandler = null;
@@ -185,7 +187,7 @@ class UIController {
             this.pageTitle.removeEventListener("dblclick", this.pageTitleEditHandler);
         }
 
-        this.pageTitleEditHandler = () => {
+        const enterEditProjectTitle = () => {
             const input = document.createElement("input");
             input.type = "text";
             input.value = this.pageTitle.textContent;
@@ -205,7 +207,7 @@ class UIController {
 
             const commitEdit = () => {
                 appController.getActiveProject().changeTitle(input.value);
-                this.renderProjectsList();                    
+                this.renderProjectsList();
                 this.rerenderPage();
             };
 
@@ -214,7 +216,16 @@ class UIController {
                 if (e.key === "Enter") e.preventDefault(), input.blur();
             });
         };
-        this.pageTitle.addEventListener("dblclick", this.pageTitleEditHandler);
+
+        this.pageTitle.addEventListener("dblclick", enterEditProjectTitle);
+
+        let projectTitlePressTimer;
+        this.pageTitle.addEventListener("touchstart", () => {
+            projectTitlePressTimer = setTimeout(enterEditProjectTitle, 500);
+        });
+        this.pageTitle.addEventListener("touchend", () => {
+            clearTimeout(projectTitlePressTimer);
+        });
 
         // Clear content and then recreate it 
         this.clearContent();
@@ -249,12 +260,10 @@ class UIController {
         description.textContent = project.description;
         descriptionContainer.appendChild(description);
 
-        // Listener to edit description with double click
-        descriptionContainer.addEventListener("dblclick", () => {
+        const enterEditProjectDescription = () => {
             const textarea = document.createElement("textarea");
             textarea.value = project.description;
-            textarea.classList.add("edit-input");
-            textarea.id = "desc-edit-input";
+            textarea.classList.add("edit-input", "desc-edit-input");
             textarea.style.overflow = "hidden";
             textarea.style.resize = "none";
             textarea.setAttribute("maxlength", "200");
@@ -275,6 +284,16 @@ class UIController {
                     textarea.blur();
                 }
             });
+        };
+
+        descriptionContainer.addEventListener("dblclick", enterEditProjectDescription);
+
+        let projectDescPressTimer;
+        descriptionContainer.addEventListener("touchstart", () => {
+            projectDescPressTimer = setTimeout(enterEditProjectDescription, 500);
+        });
+        descriptionContainer.addEventListener("touchend", () => {
+            clearTimeout(projectDescPressTimer);
         });
 
         const dividerClone = horizontalDivider.cloneNode(true);
@@ -349,7 +368,7 @@ class UIController {
                 section.appendChild(message);
             }
 
-            heading.addEventListener("dblclick", () => {
+            const enterEditListTitle = () => {
                 const input = document.createElement("input");
                 input.type = "text";
                 input.value = list.title;
@@ -359,16 +378,16 @@ class UIController {
                 const rect = heading.getBoundingClientRect();
                 input.style.width = `${rect.width + 30}px`;
 
-                heading.replaceWith(input);
-                input.focus();
-
                 input.addEventListener("input", () => {
                     input.style.width = "1px";
                     input.style.width = `${input.scrollWidth + 1}px`;
                 });
 
+                heading.replaceWith(input);
+                input.focus();
+
                 const commitEdit = () => {
-                    list.changeTitle(input.value);                    
+                    list.changeTitle(input.value);
                     this.rerenderPage();
                 };
 
@@ -376,7 +395,18 @@ class UIController {
                 input.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") e.preventDefault(), input.blur();
                 });
+            };
+
+            heading.addEventListener("dblclick", enterEditListTitle);
+
+            let listHeadingPressTimer;
+            heading.addEventListener("touchstart", () => {
+                listHeadingPressTimer = setTimeout(enterEditListTitle, 500);
             });
+            heading.addEventListener("touchend", () => {
+                clearTimeout(listHeadingPressTimer);
+            });
+
         }
 
         const ul = document.createElement("ul");
@@ -388,18 +418,26 @@ class UIController {
             const container = document.createElement("div");
             container.classList.add("list-item-container");
 
+            const left = document.createElement("div");
+            left.classList.add("todo-left");
+            container.appendChild(left);
+
+            const right = document.createElement("div");
+            right.classList.add("todo-right");
+            container.appendChild(right);
+
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             checkbox.id = `${list.title.toLowerCase()}-item-${index}`;
             checkbox.name = checkbox.id;
             checkbox.checked = todo.completed;
-            container.appendChild(checkbox);
+            left.appendChild(checkbox);
 
             const description = document.createElement("div");
             description.classList.add("todo-description");
             description.textContent = todo.description;
 
-            description.addEventListener("dblclick", () => {
+            const enterEditDescription = () => {
                 const input = document.createElement("input");
                 input.type = "text";
                 input.value = todo.description;
@@ -418,7 +456,6 @@ class UIController {
                 input.focus();
 
                 const commitEdit = () => {
-                    debugger;
                     todo.changeDescription(input.value);
                     this.rerenderPage();
                 };
@@ -427,17 +464,26 @@ class UIController {
                 input.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") input.blur();
                 });
+            };
+
+            description.addEventListener("dblclick", enterEditDescription);
+
+            let descPressTimer;
+            description.addEventListener("touchstart", () => {
+                descPressTimer = setTimeout(enterEditDescription, 500);
+            });
+            description.addEventListener("touchend", () => {
+                clearTimeout(descPressTimer);
             });
 
+            left.appendChild(description);
 
-            container.appendChild(description);
-            
             const date = document.createElement("div");
             date.classList.add("todo-date");
             const formattedDate = format(todo.dueDate, "dd MMM yyyy");
             date.textContent = formattedDate;
 
-            date.addEventListener("dblclick", () => {
+            const enterEditDate = () => {
                 const input = document.createElement("input");
                 input.type = "date";
 
@@ -455,7 +501,6 @@ class UIController {
 
                 const commitEdit = () => {
                     const validation = validator.validateTodoDate(input);
-
                     if (!validation.isValid) {
                         input.replaceWith(date);
                         return;
@@ -473,15 +518,25 @@ class UIController {
                 input.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") input.blur();
                 });
+            };
+
+            date.addEventListener("dblclick", enterEditDate);
+
+            let datePressTimer;
+            date.addEventListener("touchstart", () => {
+                datePressTimer = setTimeout(enterEditDate, 500);
+            });
+            date.addEventListener("touchend", () => {
+                clearTimeout(datePressTimer);
             });
 
-            container.appendChild(date);
+            right.appendChild(date);
 
             const priority = document.createElement("div");
             priority.classList.add("todo-priority");
             priority.textContent = todo.priority;
 
-            priority.addEventListener("dblclick", () => {
+            const enterEditPriority = () => {
                 const select = document.createElement("select");
                 select.classList.add("edit-input", "todo-edit-priority-input");
 
@@ -508,8 +563,19 @@ class UIController {
                 select.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") select.blur();
                 });
+            };
+
+            priority.addEventListener("dblclick", enterEditPriority);
+
+            let priorityPressTimer;
+            priority.addEventListener("touchstart", () => {
+                priorityPressTimer = setTimeout(enterEditPriority, 500);
             });
-            container.appendChild(priority);
+            priority.addEventListener("touchend", () => {
+                clearTimeout(priorityPressTimer);
+            });
+
+            right.appendChild(priority);
 
             if (todo.completed) {
                 description.classList.add("completed-todo-text");
@@ -538,7 +604,7 @@ class UIController {
             deleteTodoButton.classList.add("delete-todo-button");
             deleteTodoButton.classList.add("pointer");
             deleteTodoButton.innerHTML = svg.getSvgIcons().trashIcon;
-            container.appendChild(deleteTodoButton);
+            right.appendChild(deleteTodoButton);
 
             deleteTodoButton.addEventListener("click", () => {
                 todo.list.deleteTodo(todo);
@@ -656,7 +722,7 @@ class UIController {
     }
 
     setUpEventListeners() { 
-        this.newProject.addEventListener("click", (e) => {
+        this.newProject.addEventListener("click", () => {
             this.openDialog("project");
         })        
 
@@ -671,6 +737,7 @@ class UIController {
                 this.clearForm("project");
                 appController.setActiveProject(project);
                 appController.switchPage(project);
+                this.sidebar.classList.remove("open");
             } else {
                 validation.invalidInputs.forEach(({ input, reason }) => {
                     this.addErrorMessage(input, reason);
@@ -741,6 +808,22 @@ class UIController {
             this.clearErrorMessages();
             appController.switchPage();
         })
+
+        this.menuToggle.addEventListener("click", () => {
+          this.sidebar.classList.toggle("open");
+        });
+
+        document.addEventListener("click", (event) => {
+          const isClickInsideSidebar = this.sidebar.contains(event.target);
+          const isClickOnMenuButton = this.menuToggle.contains(event.target);
+          const isClickOnProjectDialog = this.newProjectDialog.contains(event.target);
+
+          // If it's not inside the sidebar and not the toggle button, close the sidebar
+          if (!isClickInsideSidebar && !isClickOnMenuButton && !isClickOnProjectDialog && this.sidebar.classList.contains("open")) {
+            this.sidebar.classList.remove("open");
+          }
+        });
+
     }
 }
 
