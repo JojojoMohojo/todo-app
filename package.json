@@ -14,8 +14,7 @@
   "scripts": {
     "start": "webpack serve --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
-    "deploy:gh-pages": "git checkout gh-pages && git rm -rf . && git checkout main -- dist && mv dist/* . && rm -rf dist && git add . && git commit -m && git push origin gh-pages && git checkout main"
-
+    "deploy:gh-pages": "git checkout gh-pages && git rm -rf . && git checkout main -- dist && mv dist/* ./ && rm -rf dist && git add ."
   },
   "dependencies": {
     "date-fns": "^4.1.0",
