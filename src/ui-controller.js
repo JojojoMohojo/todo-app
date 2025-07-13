@@ -195,7 +195,7 @@ class UIController {
             input.setAttribute("maxlength", "21");
 
             const rect = this.pageTitle.getBoundingClientRect();
-            input.style.width = `${rect.width + 30}px`;
+            input.style.width = `${rect.width + 12}px`;
 
             this.pageTitle.replaceWith(input);
             input.focus();

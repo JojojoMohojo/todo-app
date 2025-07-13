@@ -328,7 +328,7 @@ nav {
 
 .title-icon {
   height: clamp(2rem, 5vw, 4.5rem);
-  margin: 10px 10px 0 0;
+  /* margin: 10px 10px 0 0; */
 }
 
 .page-title-wrapper {
@@ -337,6 +337,7 @@ nav {
 
 .page-title {
   color: var(--black);
+  margin-left: 10px;
 }
 
 .content {
@@ -803,7 +804,11 @@ button {
   }
 
   .title-icon {
-    margin: 5px 10px 0 0;
+    margin: 5px 5px 0 0;
+  }
+
+  .page-title {
+    margin: 0;
   }
 
   .main-divider {
@@ -813,7 +818,7 @@ button {
   .project-info {
     flex-direction: column;
     height: auto;
-    padding: 10px;
+    padding: 0 10px 10px 10px;
   }
 
   .desc-container {
@@ -822,13 +827,7 @@ button {
 
   .project-description {
     height: auto;
-  }
-
-  .new-project-dialog,
-  .new-list-dialog,
-  .new-todo-dialog {
-    width: 95%;
-  }
+  }  
 
   .section {
     margin-bottom: 25px;
@@ -918,11 +917,18 @@ button {
     max-width: 35px;
   }
 
+  .new-project-dialog,
+  .new-list-dialog,
+  .new-todo-dialog {
+    top: 5%;
+    width: 95%;
+  }
+
   .new-project-form-buttons button,
   .new-list-form-buttons button,
   .new-todo-form-buttons button {
     width: 45%;
-  }
+  }  
 
   .new-todo-button,
   .delete-list-button,
@@ -935,6 +941,6 @@ button {
 
   .new-todo-button,
   .delete-list-button {
-    margin-bottom: 5px;
+    margin: 0 0 4px 0;
   }
 }
