@@ -13,6 +13,8 @@
   },
   "scripts": {
     "start": "webpack serve --open --config webpack.dev.js",
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix",
     "build": "webpack --config webpack.prod.js",
     "deploy:gh-pages": "git checkout gh-pages && git rm -rf . && git checkout main -- dist && mv dist/* ./ && rm -rf dist && git add ."
   },
